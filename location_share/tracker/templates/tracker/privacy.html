@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+{% extends 'tracker/base.html' %}
+{% load static %}
+{% block title %}プライバシーポリシー - ちょこシェアMAP{% endblock %}
+
+{% block extra_css %}
+<style>
+body {
+    background: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ヘッダーセクション */
+.privacy-header {
+    background: linear-gradient(180deg, #f8fafb 0%, #ffffff 100%);
+    padding: 60px 0 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.privacy-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(99, 179, 237, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.privacy-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a202c;
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.privacy-subtitle {
+    font-size: 1.1rem;
+    color: #64748b;
+    text-align: center;
+    margin-bottom: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.last-updated {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.95rem;
+    margin-top: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+/* コンテンツセクション */
+.privacy-content {
+    padding: 60px 0;
+    background: #ffffff;
+}
+
+.content-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* セクションカード */
+.section-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 30px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.section-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #3b82f6 0%, #06b6d4 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.section-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+.section-card:hover::before {
+    opacity: 1;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.section-icon i {
+    color: #6366f1;
+    font-size: 18px;
+}
+
+.section-content {
+    color: #475569;
+    line-height: 1.8;
+}
+
+.section-content p {
+    margin-bottom: 16px;
+}
+
+.section-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* リストスタイル */
+.privacy-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0;
+}
+
+.privacy-list li {
+    position: relative;
+    padding-left: 28px;
+    margin-bottom: 12px;
+    color: #475569;
+    line-height: 1.6;
+}
+
+.privacy-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 6px;
+    height: 6px;
+    background: #3b82f6;
+    border-radius: 50%;
+}
+
+/* 強調ボックス */
+.highlight-box {
+    background: #f0f9ff;
+    border-left: 4px solid #3b82f6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 24px 0;
+}
+
+.highlight-box-title {
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.highlight-box-content {
+    color: #1e40af;
+    line-height: 1.6;
+}
+
+/* 連絡先カード */
+.contact-card {
+    background: linear-gradient(135deg, #f8fafb 0%, #ffffff 100%);
+    border-radius: 16px;
+    padding: 32px;
+    margin-top: 40px;
+    border: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.contact-card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 20px;
+}
+
+.contact-info {
+    color: #475569;
+    line-height: 1.8;
+    margin-bottom: 16px;
+}
+
+.contact-info strong {
+    color: #1a202c;
+    display: block;
+    margin-top: 12px;
+}
+
+.btn-contact {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+    color: #ffffff;
+    padding: 12px 32px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+.btn-contact:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+    color: #ffffff;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .privacy-title {
+        font-size: 2rem;
+    }
+    
+    .section-card {
+        padding: 24px 20px;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+    }
+    
+    .contact-card {
+        padding: 24px 20px;
+    }
+}
+
+/* アニメーション */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ヘッダーセクション -->
+<section class="privacy-header">
+    <div class="container">
+        <h1 class="privacy-title fade-in-up">プライバシーポリシー</h1>
+        <p class="privacy-subtitle fade-in-up">
+            お客様に関する情報の取り扱いについて
+        </p>
+        <p class="last-updated fade-in-up">
+            最終更新日: 2025年09月02日
+        </p>
+    </div>
+</section>
+
+<!-- コンテンツセクション -->
+<section class="privacy-content">
+    <div class="container">
+        <div class="content-wrapper">
+            
+            <!-- はじめに -->
+            <div class="section-card fade-in-up">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    はじめに
+                </h2>
+                <div class="section-content">
+                    <p>
+                        ChocoShareMap運営（以下「当方」といいます）は、ちょこシェアMAP（以下「本サービス」といいます）の提供にあたり、
+                        お客様のプライバシーを尊重し、情報の保護に努めます。
+                    </p>
+                    <p>
+                        本プライバシーポリシーは、本サービスにおける情報の取り扱いについて定めたものです。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 収集する情報 -->
+            <div class="section-card fade-in-up">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    収集する情報
+                </h2>
+                <div class="section-content">
+                    <div class="highlight-box">
+                        <div class="highlight-box-title">
+                            <i class="fas fa-shield-alt"></i>
+                            重要なお知らせ
+                        </div>
+                        <div class="highlight-box-content">
+                            本サービスは登録不要のサービスであり、お客様の氏名、メールアドレス、電話番号などの個人を特定できる情報は一切収集いたしません。
+                        </div>
+                    </div>
+                    
+                    <p><strong>本サービスで一時的に取得する情報：</strong></p>
+                    <ul class="privacy-list">
+                        <li>位置情報（GPS座標）- セッション中のみ、お客様の許可を得て取得</li>
+                        <li>ニックネーム（任意で設定可能）</li>
+                        <li>チャットメッセージ（セッション中のみ）</li>
+                        <li>IPアドレス（セキュリティ目的）</li>
+                        <li>ブラウザ情報（技術的なサポート目的）</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 情報の利用目的 -->
+            <div class="section-card fade-in-up">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    情報の利用目的
+                </h2>
+                <div class="section-content">
+                    <p>取得した情報は、以下の目的でのみ利用いたします：</p>
+                    <ul class="privacy-list">
+                        <li>位置情報共有サービスの提供</li>
+                        <li>セッション参加者間での位置表示</li>
+                        <li>チャット機能の提供</li>
+                        <li>サービスの改善と品質向上</li>
+                        <li>不正利用の防止とセキュリティの確保</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- データの保存と削除 -->
+            <div class="section-card fade-in-up">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    データの保存と削除
+                </h2>
+                <div class="section-content">
+                    <div class="highlight-box">
+                        <div class="highlight-box-title">
+                            <i class="fas fa-trash-alt"></i>
+                            自動削除システム
+                        </div>
+                        <div class="highlight-box-content">
+                            セッション終了と同時に、位置情報、チャットメッセージを含むすべてのセッションデータは自動的に削除されます。
+                        </div>
+                    </div>
+                    
+                    <p><strong>データ保存期間：</strong></p>
+                    <ul class="privacy-list">
+                        <li>位置情報：セッション時間内のみ（最大12時間）</li>
+                        <li>チャットメッセージ：セッション時間内のみ</li>
+                        <li>アクセスログ：セキュリティ目的で最大30日間</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 第三者への提供 -->
+            <div class="section-card fade-in-up">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    第三者への提供
+                </h2>
+                <div class="section-content">
+                    <p>
+                        当方は、以下の場合を除き、お客様の情報を第三者に提供することはありません：
+                    </p>
+                    <ul class="privacy-list">
+                        <li>お客様の同意がある場合</li>
+                        <li>法令に基づく開示請求があった場合</li>
+                        <li>人の生命、身体または財産の保護のために必要がある場合</li>
+                        <li>公衆衛生の向上または児童の健全な育成の推進のために特に必要がある場合</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- セキュリティ -->
+            <div class="section-card fade-in-up">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    セキュリティ
+                </h2>
+                <div class="section-content">
+                    <p>
+                        当方は、お客様の情報を適切に管理し、不正アクセス、紛失、破損、改ざん、漏洩などを防ぐため、
+                        以下のセキュリティ対策を実施しています：
+                    </p>
+                    <ul class="privacy-list">
+                        <li>SSL/TLS暗号化通信の使用</li>
+                        <li>定期的なセキュリティ更新</li>
+                        <li>アクセス制限の実施</li>
+                        <li>セッション終了時の自動データ削除</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Cookie -->
+            <div class="section-card fade-in-up">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-cookie"></i>
+                    </div>
+                    Cookieの使用
+                </h2>
+                <div class="section-content">
+                    <p>
+                        本サービスでは、サービスの提供に必要な最小限のCookieを使用しています：
+                    </p>
+                    <ul class="privacy-list">
+                        <li>セッション管理用Cookie（必須）</li>
+                        <li>Google Analytics（アクセス解析）</li>
+                    </ul>
+                    <p>
+                        ブラウザの設定でCookieを無効にすることができますが、
+                        一部のサービス機能が利用できなくなる場合があります。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 改定 -->
+            <div class="section-card fade-in-up">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    プライバシーポリシーの改定
+                </h2>
+                <div class="section-content">
+                    <p>
+                        当方は、必要に応じて本プライバシーポリシーを改定することがあります。
+                        改定した場合は、本ページにて変更内容をお知らせいたします。
+                    </p>
+                    <p>
+                        重要な変更がある場合は、サービス内でも通知いたします。
+                    </p>
+                </div>
+            </div>
+
+            <!-- お問い合わせ -->
+            <div class="contact-card fade-in-up">
+                <h3 class="contact-card-title">
+                    <i class="fas fa-envelope"></i> お問い合わせ
+                </h3>
+                <div class="contact-info">
+                    <p>
+                        本サービスに関するお問い合わせは、
+                        以下の連絡先までお願いいたします。
+                    </p>
+                    <strong>事業者名：</strong>
+                    ChocoShareMap運営
+
+                    <strong>代表：</strong>
+                    藤嶋 陸
+
+                    <strong>所在地：</strong>
+                    〒192-0373<br>
+                    東京都八王子市上柚木1128-1
+
+                    <strong>電話番号：</strong>
+                    070-4225-7768
+
+                    <strong>メールアドレス：</strong>
+                    chocosharemap@gmail.com
+                </div>
+                <a href="{% url 'tracker:contact' %}" class="btn-contact">
+                    <i class="fas fa-paper-plane"></i>
+                    お問い合わせフォーム
+                </a>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<script>
+// スクロールアニメーション
+document.addEventListener('DOMContentLoaded', () => {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.section-card, .contact-card').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
+});
+</script>
+{% endblock %}

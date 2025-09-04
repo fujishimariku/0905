@@ -1,0 +1,472 @@
+{% extends 'tracker/base.html' %}
+{% load static %}
+{% csrf_token %}
+{% block title %}ちょいシェアMAP{% endblock %}
+
+{% block extra_head %}
+<!-- CSPメタタグ -->
+<meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'nonce-{{ nonce }}' https://unpkg.com/leaflet@1.9.4/ https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/;
+    style-src 'self' 'unsafe-inline' https://unpkg.com/leaflet@1.9.4/;
+    img-src 'self' data: https://*.openstreetmap.org/ https://*.tile.openstreetmap.org/;
+    connect-src 'self' {{ websocket_url|slice:':6' }}{{ request.get_host }};
+    font-src 'self' https://cdnjs.cloudflare.com/;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+">
+
+<!-- セキュリティヘッダー -->
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="X-XSS-Protection" content="1; mode=block">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i> 
+                    <span>位置情報共有マップ</span>
+                </h5>
+                <div>
+                    <small class="text-muted">残り時間: </small>
+                    <span id="countdown" class="countdown" role="timer" aria-live="polite"></span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div id="map" class="map-container" role="application" aria-label="位置情報共有マップ"></div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-cog" aria-hidden="true"></i> 設定
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="participant-name" class="form-label">表示名（30文字以内）</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="participant-name" 
+                            placeholder="例: 田中太郎"
+                            maxlength="30"
+                            autocomplete="off"
+                            spellcheck="false"
+                            data-sanitize="true"
+                            aria-describedby="participant-name-help"
+                        >
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">位置情報共有</label>
+                        <div>
+                            <button id="toggle-sharing" class="btn btn-success" type="button" aria-describedby="sharing-help">
+                                <i class="fas fa-play" aria-hidden="true"></i> 
+                                <span>共有開始</span>
+                            </button>
+                            <button id="reset-view" class="btn btn-info ms-2" type="button" aria-label="マップを全体表示にリセット">
+                                <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i> 
+                                <span>全体表示</span>
+                            </button>
+                            <button id="leave-session" class="btn btn-danger ms-2" type="button" aria-describedby="leave-help">
+                                <i class="fas fa-sign-out-alt" aria-hidden="true"></i> 
+                                <span>退出</span>
+                            </button>
+                        </div>
+                        <div id="sharing-help" class="form-text">
+                            位置情報の共有を開始/停止します
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <small class="text-muted">
+                        位置情報ステータス: 
+                        <span id="location-status" role="status" aria-live="polite">待機中</span>
+                    </small>
+                </div>
+                <div class="mt-1">
+                    <small class="text-muted">
+                        表示状態: 
+                        <span id="visibility-status" role="status" aria-live="polite">アクティブ</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-users" aria-hidden="true"></i> 参加者リスト
+                </h6>
+            </div>
+            <div class="card-body">
+                <div id="participants-list" class="participant-list" role="region" aria-live="polite" aria-label="参加者一覧">
+                    <div class="loading">
+                        <div class="spinner" role="status" aria-label="読み込み中"></div>
+                        <p>読み込み中...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle" aria-hidden="true"></i> 共有情報
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <small class="text-muted">セッションID</small>
+                    <div class="font-monospace small" data-session-id="{{ session.session_id|escapejs }}" aria-label="セッション識別子">
+                        {{ session.session_id|truncatechars:16 }}...
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">有効期限</small>
+                    <div>{{ expires_at|date:"Y/m/d H:i" }}</div>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">共有時間</small>
+                    <div>{{ session.duration_minutes }}分</div>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">ステータス</small>
+                    <div id="session-status" role="status" aria-live="polite">
+                        <span class="badge bg-success">アクティブ</span>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">WebSocket接続状態</small>
+                            <div id="websocket-status" class="fw-bold" role="status" aria-live="polite">
+                                <span class="badge bg-secondary">未接続</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">最後の通信</small>
+                            <div id="last-communication" class="fw-bold text-muted" role="status" aria-live="polite">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 権限要求モーダル -->
+<div class="modal fade" id="permission-modal" tabindex="-1" aria-labelledby="permission-modal-title" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="permission-modal-title">位置情報の利用許可</h5>
+            </div>
+            <div class="modal-body">
+                <p>位置情報を共有するには、ブラウザの位置情報アクセス許可が必要です。</p>
+                <p>「許可」をクリックして位置情報の利用を許可してください。</p>
+                <div class="alert alert-info">
+                    <small>
+                        <i class="fas fa-info-circle" aria-hidden="true"></i>
+                            - ブラウザが表示されていない間は、位置情報の送信は停止されます。<br>
+                            - ブラウザがバックグラウンド状態になると「バックグラウンド表示モード」に切り替わります。<br>
+                            - スマートフォンの場合、バックグラウンド状態が続くと一定時間後に「オフライン」と表示されます。<br>
+                            - 画面を再表示することで自動的に再接続されます。
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="requestLocation()" data-action="grant-permission">
+                    許可する
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    キャンセル
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- セッション期限切れモーダル -->
+<div class="modal fade" id="session-expired-modal" tabindex="-1" aria-labelledby="session-expired-title" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="session-expired-title">
+                    <i class="fas fa-exclamation-triangle me-2" aria-hidden="true"></i>セッション期限切れ
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning mb-3" role="alert">
+                    <i class="fas fa-clock me-2" aria-hidden="true"></i>
+                    このセッションは期限切れになりました。
+                </div>
+                <p class="mb-3">位置情報の共有が自動的に停止されました。</p>
+                <p class="mb-0 text-muted">
+                    <i class="fas fa-info-circle me-1" aria-hidden="true"></i>
+                    新しいセッションを作成するには、トップページに戻ってください。
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="goToHome()" data-action="go-home">
+                    <i class="fas fa-home me-1" aria-hidden="true"></i>トップページへ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 位置情報未対応モーダル -->
+<div class="modal fade" id="geolocation-unsupported-modal" tabindex="-1" aria-labelledby="geolocation-unsupported-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-warning">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="geolocation-unsupported-title">
+                    <i class="fas fa-exclamation-triangle me-2" aria-hidden="true"></i>位置情報未対応
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning mb-3" role="alert">
+                    <i class="fas fa-mobile-alt me-2" aria-hidden="true"></i>
+                    このブラウザでは位置情報がサポートされていません。
+                </div>
+                <p class="mb-3">位置情報を共有するには、以下のブラウザをお使いください：</p>
+                <ul class="mb-3">
+                    <li>Chrome (推奨)</li>
+                    <li>Firefox</li>
+                    <li>Safari</li>
+                    <li>Edge</li>
+                </ul>
+                <p class="mb-0 text-muted">
+                    <i class="fas fa-info-circle me-1" aria-hidden="true"></i>
+                    また、HTTPSでアクセスしている必要があります。
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-1" aria-hidden="true"></i>確認
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- エラー通知用のトースト -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 11;">
+    <div id="security-toast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="security-toast-body">
+                <!-- エラーメッセージがここに表示されます -->
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="閉じる"></button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style nonce="{{ nonce }}">
+.custom-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    border: 2px solid white;
+    position: relative;
+}
+
+.custom-marker::before {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid white;
+}
+
+#location-status {
+    font-weight: bold;
+}
+
+.status-active {
+    color: #28a745;
+}
+
+.status-background {
+    color: #6c757d;
+}
+
+.status-error {
+    color: #dc3545;
+}
+
+
+#visibility-status {
+    font-weight: bold;
+}
+
+.visibility-active {
+    color: #28a745;
+}
+
+.visibility-background {
+    color: #6c757d;
+}
+
+.participant-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    word-break: break-word;
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.status-online {
+    background-color: #28a745;
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.3);
+}
+
+.status-offline {
+    background-color: #dc3545;
+}
+
+.status-background {
+    background-color: #6c757d;
+}
+
+.status-waiting {
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.3);
+    animation: pulse-waiting 2s infinite;
+}
+
+@keyframes pulse-waiting {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(255, 193, 7, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+    }
+}
+
+.connection-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+    animation: pulse 2s infinite;
+}
+
+.connection-good {
+    background-color: #28a745;
+}
+
+.connection-poor {
+    background-color: #ffc107;
+}
+
+.connection-bad {
+    background-color: #dc3545;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.realtime-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 300px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: none;
+    border-radius: 8px;
+}
+
+.ping-indicator {
+    font-size: 0.8em;
+    color: #6c757d;
+}
+
+.following-participant {
+    background-color: rgba(13, 202, 240, 0.1);
+    border-left: 3px solid #0dcaf0;
+}
+
+/* セキュリティ強化: ユーザー入力の視覚的な検証 */
+.input-sanitized {
+    border-left: 3px solid #28a745;
+}
+
+.input-warning {
+    border-left: 3px solid #ffc107;
+}
+
+.input-error {
+    border-left: 3px solid #dc3545;
+}
+
+/* マップコンテナのセキュリティ */
+.map-container {
+    height: 400px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script nonce="{{ nonce }}">
+    // セキュリティ強化: XSS対策とデータ検証
+    window.djangoData = {
+        sessionId: "{{ session.session_id|escapejs|safe }}",
+        participantId: "{{ participant_id|escapejs|safe }}",
+        expiresAt: "{{ expires_at|date:'c'|escapejs|safe }}",
+        csrfToken: "{{ csrf_token|escapejs|safe }}",
+        websocketUrl: "{{ websocket_url|escapejs|safe }}"
+    };
+</script>
+
+<script src="{% static 'js/common.js' %}" nonce="{{ nonce }}"></script>
+<script src="{% static 'js/location-sharing.js' %}" nonce="{{ nonce }}"></script>
+{% endblock %}

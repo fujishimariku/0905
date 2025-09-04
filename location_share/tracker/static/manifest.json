@@ -1,0 +1,9 @@
+{
+  "name": "ちょこシェアMAP",
+  "short_name": "ちょこMAP",
+  "description": "位置情報共有サービス",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#007bff",
+  "background_color": "#ffffff"
+}

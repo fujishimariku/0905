@@ -1,0 +1,42 @@
+<!-- tracker/templates/tracker/expired.html -->
+{% extends 'tracker/base.html' %}
+{% load static %}
+{% block title %}セッション期限切れ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="text-warning mb-3">
+                    <i class="fas fa-exclamation-triangle fa-3x"></i>
+                </div>
+                
+                <h2 class="card-title text-warning">セッションが期限切れです</h2>
+                
+                <p class="card-text mt-3">
+                    この位置情報共有セッションは既に期限切れになっています。
+                </p>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>セッション情報</strong><br>
+                    セッションID: <code>{{ session.session_id }}</code><br>
+                    作成日時: {{ session.created_at|date:"Y年m月d日 H:i" }}<br>
+                    期限: {{ session.expires_at|date:"Y年m月d日 H:i" }}<br>
+                    共有時間: {{ session.duration_minutes }}分
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{% url 'tracker:home' %}" class="btn btn-primary">
+                        <i class="fas fa-home"></i> 新しいセッションを作成
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/common.js' %}" nonce="{{ nonce }}"></script>
+{% endblock %}

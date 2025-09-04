@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<!-- 最適化されたフォント読み込み版 -->
+{% load static %}
+{% block extra_js %}{% endblock %}
+
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
+    <title>{% block title %}ちょこシェアMAP｜登録不要で位置情報を一時共有｜今だけ伝えたい場所をスマートに{% endblock %}</title>
+    <meta name="title" content="ちょこシェアMAP｜登録不要で位置情報を一時共有｜今だけ伝えたい場所をスマートに">
+    <meta name="description" content="登録不要、ブラウザで一時的に位置情報を共有できるサービス。今だけ伝えたい場所がある方へ。すぐに・安全に、あとくされなく位置共有。リアルタイム地図共有アプリ">
+    <meta name="keywords" content="位置情報共有,現在地共有,地図共有,web,ウェブ,登録不要,ブラウザ,GPS,待ち合わせ,場所共有,一時的,安全,プライバシー,スマートフォン,チョコマップ,チョコMAP">
+    <meta name="author" content="ちょこシェアMAP">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://locationsshare.com/{% block canonical %}{% endblock %}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="ちょこシェアMAP｜登録不要で位置情報を一時共有">
+    <meta property="og:description" content="登録不要、ブラウザで一時的に位置情報を共有できるサービス。今だけ伝えたい場所がある方へ。すぐに・安全に、あとくされなく位置共有。">
+    <meta property="og:url" content="https://locationsshare.com/">
+    <meta property="og:site_name" content="ちょこシェアMAP">
+    <meta property="og:locale" content="ja_JP">
+    
+    <!-- Twitter -->
+    <meta name="twitter:title" content="ちょこシェアMAP｜登録不要で位置情報を一時共有">
+    <meta name="twitter:description" content="登録不要、ブラウザで一時的に位置情報を共有できるサービス。今だけ伝えたい場所がある方へ。">
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "ちょこシェアMAP",
+        "alternateName": "ちょこMAP",
+        "description": "登録不要、ブラウザで一時的に位置情報を共有できるWebアプリケーション",
+        "url": "https://locationsshare.com/",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+        },
+        "featureList": [
+            "登録不要の位置情報共有",
+            "リアルタイム地図表示",
+            "一時的な共有リンク生成",
+            "プライバシー保護"
+        ],
+        "author": {
+            "@type": "Organization",
+            "name": "ちょこシェアMAP"
+        }
+    }
+    </script>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#007bff">
+    
+    <!-- DNS Prefetch & Preconnect -->
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="//unpkg.com">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    
+    <!-- フォント最適化: Font Awesomeのプリロードとfont-display設定 -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+    
+    <!-- CSS Preload for Critical Resources -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"></noscript>
+    
+    <!-- CSS - Font Awesome with font-display optimization -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"></noscript>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+/* Font Awesomeのfont-display最適化 */
+@font-face {
+    font-family: "Font Awesome 6 Free";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Font Awesome 6 Free";
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Font Awesome 6 Brands";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    background-color: #fafbfc;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ナビゲーションバー（ヘッダー）のスタイル */
+.navbar {
+    position: relative;
+    overflow: hidden;
+    min-height: 80px;
+    padding: 20px 0;
+    box-shadow: 
+        0 2px 8px rgba(0,0,0,0.15),
+        0 1px 3px rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    background: transparent;
+}
+
+/* ヘッダー地図背景 */
+.navbar-map-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.navbar-map-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, 
+        rgba(59, 130, 246, 0.85) 0%, 
+        rgba(6, 182, 212, 0.85) 100%);
+    z-index: 1;
+    backdrop-filter: blur(1px);
+}
+
+.navbar .container {
+    position: relative;
+    z-index: 2;
+}
+
+.navbar .navbar-brand,
+.navbar .nav-link {
+    color: #ffffff !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.navbar .navbar-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar .navbar-brand:hover {
+    transform: translateX(3px);
+    color: #f0f0f0 !important;
+}
+
+.navbar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    color: #ffffff !important;
+}
+
+.card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+}
+
+.map-container {
+    height: 400px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.participant-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.participant-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+}
+
+.participant-item:last-child {
+    border-bottom: none;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-online {
+    background-color: #28a745;
+}
+
+.status-offline {
+    background-color: #dc3545;
+}
+
+.countdown {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #dc3545;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 2s linear infinite;
+    margin: 0 auto 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.main-content {
+    flex: 1 0 auto;
+}
+
+/* フッターのスタイル */
+.footer {
+    padding: 30px 0;
+    margin-top: auto;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+        0 -2px 10px rgba(0,0,0,0.15),
+        0 -1px 4px rgba(0,0,0,0.1);
+    border-top: 1px solid rgba(0,0,0,0.1);
+    background: transparent;
+    min-height: 150px;
+}
+
+/* フッター地図背景 */
+.footer-map-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.footer-map-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, 
+        rgba(30, 41, 59, 0.9) 0%, 
+        rgba(15, 23, 42, 0.9) 100%);
+    z-index: 1;
+}
+
+.footer .container {
+    position: relative;
+    z-index: 2;
+}
+
+.footer h6 {
+    color: #ffffff;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.footer p,
+.footer .text-muted {
+    color: rgba(255, 255, 255, 0.9) !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.footer a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+/* ソーシャルボタンのスタイル */
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    color: #6c757d;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+        0 2px 4px rgba(0,0,0,0.1),
+        inset 0 1px 2px rgba(255,255,255,0.5);
+}
+
+.social-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 50% 50%, rgba(0,0,0,0.02) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.social-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 4px 8px rgba(0,0,0,0.1),
+        0 2px 4px rgba(0,0,0,0.06);
+    background: #f8f9fa;
+    color: #495057;
+}
+
+.social-btn[data-social="twitter"]:hover {
+    background: #e8f5fd;
+    color: #1da1f2;
+    border-color: #1da1f2;
+    box-shadow: 
+        0 4px 12px rgba(29, 161, 242, 0.15),
+        0 2px 4px rgba(29, 161, 242, 0.1);
+}
+
+.social-btn[data-social="facebook"]:hover {
+    background: #e8eef7;
+    color: #4267B2;
+    border-color: #4267B2;
+    box-shadow: 
+        0 4px 12px rgba(66, 103, 178, 0.15),
+        0 2px 4px rgba(66, 103, 178, 0.1);
+}
+
+.custom-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 10px;
+    padding: 20px 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    max-width: 400px;
+    transform: translateX(500px);
+    transition: all 0.4s ease;
+}
+
+.custom-alert.show {
+    transform: translateX(0);
+}
+
+.custom-alert.success {
+    border-left: 4px solid #28a745;
+}
+
+.custom-alert.info {
+    border-left: 4px solid #17a2b8;
+}
+
+.custom-alert.warning {
+    border-left: 4px solid #ffc107;
+}
+
+.custom-alert.error {
+    border-left: 4px solid #dc3545;
+}
+
+.custom-alert .alert-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 20px;
+    font-size: 12px;
+    color: white;
+}
+
+.custom-alert.success .alert-icon {
+    background: #28a745;
+}
+
+.custom-alert.info .alert-icon {
+    background: #17a2b8;
+}
+
+.custom-alert.warning .alert-icon {
+    background: #ffc107;
+}
+
+.custom-alert.error .alert-icon {
+    background: #dc3545;
+}
+
+.custom-alert .alert-content {
+    display: inline-block;
+    vertical-align: top;
+    flex: 1;
+}
+
+.custom-alert .alert-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.custom-alert .alert-message {
+    color: #666;
+    line-height: 1.4;
+}
+
+.custom-alert .alert-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-alert .alert-close:hover {
+    color: #333;
+}
+
+/* メディアクエリ */
+@media (max-width: 767px) {
+    /* プライバシーポリシーリンクの下に余白を追加 */
+    .footer .col-md-6:first-child .mt-2 {
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* flexboxによる確実な横並び配置 */
+@media (max-width: 480px) {
+    .navbar .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: nowrap; /* 折り返さない */
+    }
+    
+    .navbar .navbar-brand {
+        flex-shrink: 1; /* 必要に応じて縮小可能 */
+        white-space: nowrap; /* テキストの折り返しを防ぐ */
+        overflow: hidden;
+        text-overflow: ellipsis; /* 長すぎる場合は...で省略 */
+        max-width: 60%; /* 最大幅を制限 */
+        font-size: 19px;
+    }
+    
+    .navbar .navbar-nav {
+        flex-shrink: 0; /* 縮小しない */
+    }
+        .navbar .nav-link {
+        font-size: 16px;
+        padding: 6px 10px;
+    }
+}
+
+/* 365px〜480pxの中間サイズ対応 */
+@media (min-width: 366px) and (max-width: 480px) {
+    /* この範囲ではアイコンを表示 */
+    .navbar .nav-link .fas {
+        font-size: 12px;
+        margin-right: 4px;
+    }
+}
+
+/* 365px以下のモバイル対応 */
+@media (max-width: 365px) {
+    /* ナビゲーションバーの調整 */
+    .navbar {
+        min-height: 60px;
+        padding: 10px 0;
+    }
+    
+    .navbar .container {
+        padding: 0 10px;
+    }
+    
+    /* ブランド名とアイコンの調整 */
+    .navbar .navbar-brand {
+        font-size: 16px;
+        padding: 5px 0;
+        gap: 5px;
+    }
+    
+    .navbar .navbar-brand img {
+        width: 24px;
+        height: 24px;
+    }
+    
+    /* お問い合わせリンクの調整 */
+    .navbar .navbar-nav {
+        margin-left: auto !important;
+    }
+    
+    .navbar .nav-link {
+        font-size: 14px;
+        padding: 5px 8px !important;
+    }
+    
+    /* アイコンの非表示（スペース節約） */
+    .navbar .nav-link .fas {
+        display: none;
+    }
+    
+    /* ホバー時のパディング調整 */
+    .navbar .nav-link:hover {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+}
+
+/* 極小画面（320px以下）への対応 */
+@media (max-width: 320px) {
+    .navbar {
+        min-height: 50px;
+        padding: 8px 0;
+    }
+    
+    .navbar .navbar-brand {
+        font-size: 13px;
+        max-width: 55%;
+    }
+    
+    .navbar .navbar-brand img {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .navbar .nav-link {
+        font-size: 11px;
+        padding: 4px 6px !important;
+    }
+}
+    </style>
+    
+    <!-- Additional Meta for Mobile -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ちょこシェア">
+    
+    <!-- Geo Meta -->
+    <meta name="geo.region" content="JP">
+    <meta name="geo.placename" content="Japan">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">    
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- ナビゲーション -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <!-- ヘッダー地図背景 -->
+        <div id="headerMap" class="navbar-map-bg"></div>
+        <div class="navbar-map-overlay"></div>
+        
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'tracker:home' %}">
+                <i class="fas fa-map-marked-alt"></i>
+                ちょこシェアMAP
+            </a>
+
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'tracker:contact' %}">
+                    <i class="fas fa-envelope"></i> お問い合わせ
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- メインコンテンツ -->
+    <div class="main-content">
+        <div class="container mt-4">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+    
+    <!-- フッター -->
+<!-- フッター部分のみ抜粋 -->
+<footer class="footer">
+    <!-- フッター地図背景 -->
+    <div id="footerMap" class="footer-map-bg"></div>
+    <div class="footer-map-overlay"></div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+		    <p class="text-muted mb-2"><i class="fas fa-map-marker-alt"></i> ちょこシェアMAP</p>
+                <p class="text-muted mb-2">煩わしい処理は一切なし。誰でも気軽にサクッと位置シェア。</p>
+                <div class="mt-2">
+                    <a href="{% url 'tracker:privacy' %}" class="text-muted me-3">
+                        <i class="fas fa-shield-alt"></i> プライバシーポリシー
+                    </a>
+                    <a href="{% url 'tracker:contact' %}" class="text-muted">
+                        <i class="fas fa-envelope"></i> お問い合わせ
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="mb-2">
+                    <button class="social-btn me-3" data-social="twitter" title="Twitterでシェア">
+                        <i class="fab fa-twitter"></i>
+                    </button>
+                    <button class="social-btn" data-social="facebook" title="Facebookでシェア">
+                        <i class="fab fa-facebook"></i>
+                    </button>
+                </div>
+                <p class="text-muted mb-0">
+                    &copy; {{ "now"|date:"Y" }} 2025 Riku Fujishima
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- 地図背景の初期化 -->
+    <script nonce="{{ nonce }}">
+        document.addEventListener('DOMContentLoaded', function() {
+            // 都市データの定義
+            var cities = [
+                {
+                    name: 'Tokyo',
+                    center: [35.6762, 139.6503],
+                    markers: [
+                        [35.6762, 139.6503],  // 東京駅
+                        [35.6585, 139.7454],  // 東京タワー
+                        [35.6895, 139.6917],  // 新宿
+                        [35.7295, 139.7109],  // 上野
+                        [35.6595, 139.7004]   // 六本木
+                    ]
+                },
+                {
+                    name: 'Sydney',
+                    center: [-33.8688, 151.2093],
+                    markers: [
+                        [-33.8688, 151.2093],  // シドニー中心
+                        [-33.8568, 151.2153],  // オペラハウス
+                        [-33.8736, 151.2070],  // ハーバーブリッジ
+                        [-33.8915, 151.2767],  // ボンダイビーチ
+                        [-33.8520, 151.2108]   // ダーリングハーバー
+                    ]
+                },
+                {
+                    name: 'London',
+                    center: [51.5074, -0.1278],
+                    markers: [
+                        [51.5074, -0.1278],   // ロンドン中心
+                        [51.5014, -0.1419],   // ビッグベン
+                        [51.5081, -0.1280],   // タワーブリッジ
+                        [51.5139, -0.0984],   // バッキンガム宮殿
+                        [51.5033, -0.1195]    // ロンドンアイ
+                    ]
+                },
+                {
+                    name: 'Paris',
+                    center: [48.8566, 2.3522],
+                    markers: [
+                        [48.8566, 2.3522],    // パリ中心
+                        [48.8584, 2.2945],    // エッフェル塔
+                        [48.8606, 2.3376],    // ルーヴル美術館
+                        [48.8530, 2.3499],    // ノートルダム大聖堂
+                        [48.8738, 2.2950]     // 凱旋門
+                    ]
+                }
+            ];
+            
+            // ランダムに都市を選択（ヘッダーとフッターで別々）
+            var headerCity = cities[Math.floor(Math.random() * cities.length)];
+            var footerCity = cities[Math.floor(Math.random() * cities.length)];
+            
+            // ヘッダー地図の初期化
+            if (document.getElementById('headerMap')) {
+                var headerMap = L.map('headerMap', {
+                    zoomControl: false,
+                    scrollWheelZoom: false,
+                    doubleClickZoom: false,
+                    touchZoom: false,
+                    dragging: false,
+                    attributionControl: false,
+                    keyboard: false
+                }).setView(headerCity.center, 14);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    opacity: 1.0
+                }).addTo(headerMap);
+                
+                // 選択された都市のマーカーを配置
+                headerCity.markers.forEach(function(pos, index) {
+                    setTimeout(function() {
+                        L.circleMarker(pos, {
+                            radius: 6,
+                            fillColor: "#ffffff",
+                            color: "#3b82f6",
+                            weight: 2,
+                            opacity: 0.8,
+                            fillOpacity: 0.6
+                        }).addTo(headerMap);
+                    }, index * 200);
+                });
+                
+                // デバッグ用：どの都市が選ばれたかコンソールに表示
+                console.log('Header map city:', headerCity.name);
+            }
+            
+            // フッター地図の初期化
+            if (document.getElementById('footerMap')) {
+                var footerMap = L.map('footerMap', {
+                    zoomControl: false,
+                    scrollWheelZoom: false,
+                    doubleClickZoom: false,
+                    touchZoom: false,
+                    dragging: false,
+                    attributionControl: false,
+                    keyboard: false
+                }).setView(footerCity.center, 13);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    opacity: 1.0
+                }).addTo(footerMap);
+                
+                // 選択された都市のマーカーを配置
+                footerCity.markers.forEach(function(pos, index) {
+                    setTimeout(function() {
+                        L.circleMarker(pos, {
+                            radius: 5,
+                            fillColor: "#06b6d4",
+                            color: "#ffffff",
+                            weight: 2,
+                            opacity: 0.7,
+                            fillOpacity: 0.5
+                        }).addTo(footerMap);
+                    }, index * 150);
+                });
+                
+                // デバッグ用：どの都市が選ばれたかコンソールに表示
+                console.log('Footer map city:', footerCity.name);
+            }
+            
+            // ウィンドウリサイズ時に地図を更新
+            window.addEventListener('resize', function() {
+                if (typeof headerMap !== 'undefined') {
+                    headerMap.invalidateSize();
+                }
+                if (typeof footerMap !== 'undefined') {
+                    footerMap.invalidateSize();
+                }
+            });
+        });
+    </script>
+    
+    <!-- フォント読み込み完了検知とクラス追加 -->
+    <script nonce="{{ nonce }}">
+        // フォント読み込み完了後にクラスを追加
+        if ('fonts' in document) {
+            Promise.all([
+                document.fonts.load('900 1em "Font Awesome 6 Free"'),
+                document.fonts.load('400 1em "Font Awesome 6 Brands"')
+            ]).then(function() {
+                document.documentElement.classList.add('fonts-loaded');
+            }).catch(function() {
+                // フォント読み込みが失敗した場合でもクラスを追加（フォールバック）
+                setTimeout(function() {
+                    document.documentElement.classList.add('fonts-loaded');
+                }, 1000);
+            });
+        } else {
+            // Font Loading APIがサポートされていない場合のフォールバック
+            setTimeout(function() {
+                document.documentElement.classList.add('fonts-loaded');
+            }, 1000);
+        }
+    </script>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-12HXTS8CWC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-12HXTS8CWC');
+</script>
+    <script src="{% static 'js/common.js' %}" nonce="{{ nonce }}" defer></script>
+</body>
+</html>

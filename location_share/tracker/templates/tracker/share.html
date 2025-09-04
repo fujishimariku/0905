@@ -1,0 +1,1540 @@
+{% extends 'tracker/base.html' %}
+{% load static %}
+{% csrf_token %}
+{% block title %}ちょこシェアMAP{% endblock %}
+
+{% block extra_head %}
+<!-- CSPメタタグ -->
+<meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'nonce-{{ nonce }}' https://unpkg.com/leaflet@1.9.4/ https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/;
+    style-src 'self' 'unsafe-inline' https://unpkg.com/leaflet@1.9.4/;
+    img-src 'self' data: https://*.openstreetmap.org/ https://*.tile.openstreetmap.org/;
+    connect-src 'self' {{ websocket_url|slice:':6' }}{{ request.get_host }};
+    font-src 'self' https://cdnjs.cloudflare.com/;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+">
+<!-- 既存のviewportタグを以下に変更 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- セキュリティヘッダー -->
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="X-XSS-Protection" content="1; mode=block">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i> 
+                    <span>マップ</span>
+                </h5>
+                <div class="d-flex align-items-center gap-3">
+                    <div>
+                        <small class="text-muted">残り時間: </small>
+                        <span id="countdown" class="countdown" role="timer" aria-live="polite"></span>
+                    </div>
+                    <!-- チャットアイコン追加 -->
+                    <button id="chat-button" aria-label="チャットを開く" class="btn btn-sm position-relative" style="background-color: #00b300; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; padding: 0;">
+                        <i class="fas fa-comment"></i>
+                        <span id="chat-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
+                            0
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div id="map" class="map-container" role="application" aria-label="位置情報共有マップ"></div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-cog" aria-hidden="true"></i> 設定
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="participant-name" class="form-label">表示名（30文字以内）</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="participant-name" 
+                            placeholder="例: 田中太郎"
+                            maxlength="30"
+                            autocomplete="off"
+                            spellcheck="false"
+                            data-sanitize="true"
+                            aria-describedby="participant-name-help"
+                        >
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">位置情報共有</label>
+                        <div>
+                            <button id="toggle-sharing" class="btn btn-success" type="button" aria-describedby="sharing-help">
+                                <i class="fas fa-play" aria-hidden="true"></i> 
+                                <span>共有開始</span>
+                            </button>
+                            <button id="reset-view" class="btn btn-info ms-2" type="button" aria-label="マップを全体表示にリセット">
+                                <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i> 
+                                <span>全体表示</span>
+                            </button>
+                            <button id="leave-session" class="btn btn-danger ms-2" type="button" aria-describedby="leave-help">
+                                <i class="fas fa-sign-out-alt" aria-hidden="true"></i> 
+                                <span>退出</span>
+                            </button>
+                        </div>
+                        <div id="sharing-help" class="form-text">
+                            位置情報の共有を開始/停止します
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <small class="text-muted">
+                        位置情報ステータス: 
+                        <span id="location-status" role="status" aria-live="polite">待機中</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-users" aria-hidden="true"></i> 参加者リスト
+                </h6>
+            </div>
+            <div class="card-body">
+                <div id="participants-list" class="participant-list" role="region" aria-live="polite" aria-label="参加者一覧">
+                    <div class="loading">
+                        <div class="spinner" role="status" aria-label="読み込み中"></div>
+                        <p>読み込み中...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle" aria-hidden="true"></i> 共有情報
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <small class="text-muted">セッションID</small>
+                    <div class="font-monospace small" data-session-id="{{ session.session_id|escapejs }}" aria-label="セッション識別子">
+                        {{ session.session_id|truncatechars:16 }}...
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">有効期限</small>
+                    <div>{{ expires_at|date:"Y/m/d H:i" }}</div>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">共有時間</small>
+                    <div>{{ session.duration_minutes }}分</div>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">ステータス</small>
+                    <div id="session-status" role="status" aria-live="polite">
+                        <span class="badge bg-success">アクティブ</span>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">WebSocket接続状態</small>
+                            <div id="websocket-status" class="fw-bold" role="status" aria-live="polite">
+                                <span class="badge bg-secondary">未接続</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">最後の通信</small>
+                            <div id="last-communication" class="fw-bold text-muted" role="status" aria-live="polite">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 権限要求モーダル -->
+<div class="modal fade" id="permission-modal" tabindex="-1" aria-labelledby="permission-modal-title" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="permission-modal-title">位置情報の利用許可</h5>
+            </div>
+            <div class="modal-body">
+                <p>位置情報を共有するには、ブラウザの位置情報アクセス許可が必要です。</p>
+                <p>「許可」をクリックして位置情報の利用を許可してください。</p>
+                <div class="alert alert-info">
+                    <small>
+                        <i class="fas fa-info-circle" aria-hidden="true"></i>
+                            - ブラウザが表示されていない間は、位置情報の送信は停止されます。<br>
+                            - ブラウザがバックグラウンド状態になると「バックグラウンド表示モード」に切り替わります。<br>
+                            - ブラウザを再表示することで自動的に再接続されます。
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="requestLocation()" data-action="grant-permission">
+                    許可する
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    キャンセル
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- セッション期限切れモーダル -->
+<div class="modal fade" id="session-expired-modal" tabindex="-1" aria-labelledby="session-expired-title" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="session-expired-title">
+                    <i class="fas fa-exclamation-triangle me-2" aria-hidden="true"></i>セッション期限切れ
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning mb-3" role="alert">
+                    <i class="fas fa-clock me-2" aria-hidden="true"></i>
+                    このセッションは期限切れになりました。
+                </div>
+                <p class="mb-3">位置情報の共有が自動的に停止されました。</p>
+                <p class="mb-0 text-muted">
+                    <i class="fas fa-info-circle me-1" aria-hidden="true"></i>
+                    新しいセッションを作成するには、トップページに戻ってください。
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="goToHome()" data-action="go-home">
+                    <i class="fas fa-home me-1" aria-hidden="true"></i>トップページへ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 位置情報未対応モーダル -->
+<div class="modal fade" id="geolocation-unsupported-modal" tabindex="-1" aria-labelledby="geolocation-unsupported-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-warning">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="geolocation-unsupported-title">
+                    <i class="fas fa-exclamation-triangle me-2" aria-hidden="true"></i>位置情報未対応
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning mb-3" role="alert">
+                    <i class="fas fa-mobile-alt me-2" aria-hidden="true"></i>
+                    このブラウザでは位置情報がサポートされていません。
+                </div>
+                <p class="mb-3">位置情報を共有するには、以下のブラウザをお使いください：</p>
+                <ul class="mb-3">
+                    <li>Chrome (推奨)</li>
+                    <li>Firefox</li>
+                    <li>Safari</li>
+                    <li>Edge</li>
+                </ul>
+                <p class="mb-0 text-muted">
+                    <i class="fas fa-info-circle me-1" aria-hidden="true"></i>
+                    また、HTTPSでアクセスしている必要があります。
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-1" aria-hidden="true"></i>確認
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- チャットモーダルを追加（他のモーダルの後に配置） -->
+<div id="chat-modal" class="chat-modal" style="display: none;">
+    <div class="chat-container">
+        <!-- 参加者リスト画面 -->
+        <div id="participants-screen" class="chat-screen active">
+            <div class="chat-header">
+                <button class="close-btn" onclick="chatManager.closeChat()">×</button>
+                <h5>チャット</h5>
+                <div class="header-space"></div>
+            </div>
+            <div class="chat-participant-list" id="chat-participant-list">
+                <!-- 動的に生成 -->
+            </div>
+        </div>
+        
+        <!-- グループチャット画面 -->
+        <div id="group-chat-screen" class="chat-screen">
+            <div class="chat-header">
+                <button class="back-btn" onclick="chatManager.showParticipantsList()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h5>グループチャット</h5>
+                <button class="close-btn" onclick="chatManager.closeChat()">×</button>
+            </div>
+            <div class="chat-messages" id="group-messages">
+                <div class="chat-welcome">
+                    <i class="fas fa-comments" style="font-size: 48px; color: #00b300; opacity: 0.3;"></i>
+                    <p style="color: #999; margin-top: 10px;">グループチャットへようこそ！</p>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="group-input" class="chat-input" placeholder="メッセージを入力..." maxlength="200">
+                <button class="send-btn" onclick="chatManager.sendGroupMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 個別チャット画面 -->
+        <div id="individual-chat-screen" class="chat-screen">
+            <div class="chat-header">
+                <button class="back-btn" onclick="chatManager.showParticipantsList()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h5 id="individual-chat-title">個別チャット</h5>
+                <button class="close-btn" onclick="chatManager.closeChat()">×</button>
+            </div>
+            <div class="chat-messages" id="individual-messages">
+                <div class="chat-welcome">
+                    <i class="fas fa-comment" style="font-size: 48px; color: #00b300; opacity: 0.3;"></i>
+                    <p style="color: #999; margin-top: 10px;">チャットを開始しましょう！</p>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <div id="typing-indicator" class="typing-indicator" style="display: none;">
+                    <span></span>が入力中...
+                </div>
+                <input type="text" id="individual-input" class="chat-input" placeholder="メッセージを入力..." maxlength="200">
+                <button class="send-btn" onclick="chatManager.sendIndividualMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- エラー通知用のトースト -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 11;">
+    <div id="security-toast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="security-toast-body">
+                <!-- エラーメッセージがここに表示されます -->
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="閉じる"></button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style nonce="{{ nonce }}">
+.custom-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    border: 2px solid white;
+    position: relative;
+}
+
+.custom-marker::before {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid white;
+}
+
+#location-status {
+    font-weight: bold;
+}
+
+.status-active {
+    color: #28a745;
+}
+
+
+.status-error {
+    color: #dc3545;
+}
+
+
+#visibility-status {
+    font-weight: bold;
+}
+
+.visibility-active {
+    color: #28a745;
+}
+
+.visibility-background {
+    color: #6c757d;
+}
+
+.participant-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    word-break: break-word;
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.status-online {
+    background-color: #28a745;
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.3);
+}
+
+.status-offline {
+    background-color: #dc3545;
+}
+
+
+.status-waiting {
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.3);
+    animation: pulse-waiting 2s infinite;
+}
+
+@keyframes pulse-waiting {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(255, 193, 7, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+    }
+}
+
+.connection-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+    animation: pulse 2s infinite;
+}
+
+.connection-good {
+    background-color: #28a745;
+}
+
+.connection-poor {
+    background-color: #ffc107;
+}
+
+.connection-bad {
+    background-color: #dc3545;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.realtime-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 300px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: none;
+    border-radius: 8px;
+}
+
+.ping-indicator {
+    font-size: 0.8em;
+    color: #6c757d;
+}
+
+.following-participant {
+    background-color: rgba(13, 202, 240, 0.1);
+    border-left: 3px solid #0dcaf0;
+}
+
+/* セキュリティ強化: ユーザー入力の視覚的な検証 */
+.input-sanitized {
+    border-left: 3px solid #28a745;
+}
+
+.input-warning {
+    border-left: 3px solid #ffc107;
+}
+
+.input-error {
+    border-left: 3px solid #dc3545;
+}
+
+/* マップコンテナのセキュリティ */
+.map-container {
+    height: 400px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+.custom-marker {
+    transition: all 0.3s ease;
+}
+
+.custom-marker:hover {
+    transform: scale(1.1);
+}
+
+/* オフセットマーカー用の追加スタイル */
+.custom-div-icon {
+    transition: all 0.2s ease;
+}
+
+/* 1200px以下でのボタンレイアウト調整 */
+@media (max-width: 1200px) {
+    .card-body .row {
+        flex-direction: column;
+    }
+    
+    .card-body .col-md-6 {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+    
+    .card-body .col-md-6:last-child {
+        margin-bottom: 0;
+    }
+    
+    /* ボタンエリアを表示名入力の下に配置 */
+    .card-body .col-md-6:nth-child(2) {
+        order: 2;
+    }
+    
+    .card-body .col-md-6:first-child {
+        order: 1;
+    }
+    
+    /* ボタンの横並びを維持しつつ、適切なサイズに調整 */
+    #toggle-sharing, #reset-view, #leave-session {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+}
+
+/* チャットモーダル */
+/* チャットモーダル - ふんわり表示版 */
+/* チャットモーダル - opacity 0.85追加 */
+.chat-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.425); /* 0.5 * 0.85 = 0.425 */
+    z-index: 10000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.chat-modal.open {
+    display: flex;
+    opacity: 0.90; /* ここを0.85に */
+}
+
+.chat-container {
+    width: 90%;
+    max-width: 600px;
+    height: 80vh;
+    max-height: 600px;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.chat-modal.open .chat-container {
+    transform: scale(1);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chat-screen {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+}
+
+.chat-screen.active {
+    display: flex;
+}
+
+/* ヘッダー */
+.chat-header {
+    background: #00b300;
+    color: white;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.chat-header h5 {
+    margin: 0;
+    font-size: 18px;
+    flex: 1;
+    text-align: center;
+}
+
+.back-btn, .close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: opacity 0.2s;
+}
+
+.back-btn:hover, .close-btn:hover {
+    opacity: 0.7;
+}
+
+.header-space {
+    width: 30px;
+}
+
+/* 参加者リスト */
+.chat-participant-list {
+    flex: 1;
+    overflow-y: auto;
+    background: #f5f5f5;
+}
+
+.chat-participant-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: white;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+}
+
+.chat-participant-item:hover {
+    background: #f9f9f9;
+}
+
+.chat-participant-item.group {
+    color: #00b300;
+}
+
+.participant-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #00b300;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 15px;
+    position: relative;
+}
+
+.participant-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.participant-name {
+    font-weight: 500;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.last-message {
+    font-size: 13px;
+    color: #999;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-participant-item.group .last-message {
+    color: rgba(0, 0, 0, 0.9);
+}
+
+.message-time {
+    font-size: 12px;
+    color: #999;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.unread-badge {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    background: #ff3333;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* メッセージエリア */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    padding-bottom: 5px; /* 下部パディングを調整 */
+    background: #e5ddd5;
+    position: relative;
+}
+
+.chat-welcome {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.message {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: flex-end;
+    animation: messageIn 0.3s ease;
+}
+
+@keyframes messageIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message.own {
+    justify-content: flex-end;
+}
+
+.message-bubble {
+    max-width: 70%;
+    padding: 10px 15px;
+    border-radius: 18px;
+    word-wrap: break-word;
+    position: relative;
+}
+
+.message.own .message-bubble {
+    background: #00b300;
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.message:not(.own) .message-bubble {
+    background: white;
+    border-bottom-left-radius: 4px;
+}
+
+.message-sender {
+    font-size: 11px;
+    color: #00b300;
+    margin-bottom: 3px;
+    font-weight: 500;
+}
+
+.message.own .message-sender {
+    display: none;
+}
+
+.message-time-label {
+    font-size: 11px;
+    color: #999;
+    margin-top: 3px;
+}
+
+.message.own .message-time-label {
+    color: rgba(255, 255, 255, 0.7);
+    text-align: right;
+}
+
+.system-message {
+    text-align: center;
+    padding: 5px;
+    margin: 10px 0;
+    font-size: 12px;
+    color: #666;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+}
+
+/* 入力エリア */
+.chat-input-area {
+    padding: 10px;
+    background: white;
+    border-top: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative; /* 追加：相対配置の基準に */
+}
+
+.chat-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    outline: none;
+    font-size: 16px; /* 16px以上にすることでiOSのズームを防ぐ */
+    transition: border-color 0.2s;
+    /* ズーム防止用の追加設定 */
+    -webkit-text-size-adjust: 100%;
+    -webkit-appearance: none;
+}
+/* 他の入力フィールドも同様に調整 */
+#participant-name {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    -webkit-appearance: none;
+}
+.chat-input:focus {
+    border-color: #00b300;
+    font-size: 16px; /* フォーカス時もサイズ維持 */
+}
+
+.send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #00b300;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.send-btn:hover {
+    background: #00a000;
+}
+
+.send-btn:active {
+    transform: scale(0.95);
+}
+
+.send-btn.sending {
+    animation: pulse 0.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* 入力中インジケーター */
+.typing-indicator {
+    position: absolute; /* 絶対配置に変更 */
+    bottom: 100%; /* 親要素（chat-input-area）の上端に配置 */
+    left: 10px; /* 左側の余白 */
+    right: 10px; /* 右側の余白 */
+    font-size: 12px;
+    color: #666;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.95); /* 半透明の白背景 */
+    border: 1px solid rgba(0, 179, 0, 0.2);
+    border-radius: 10px 10px 0 0; /* 上部のみ角丸 */
+    margin-bottom: 0; /* 下部マージンを削除 */
+    animation: slideUp 0.2s ease;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10; /* 他の要素より前面に */
+}
+
+/* iOS対応 */
+@supports (-webkit-touch-callout: none) {
+    .chat-container {
+        height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 40px);
+    }
+    
+    .chat-input {
+        font-size: 16px !important; /* 強制的に16px */
+        transform: scale(0.875); /* 見た目を14pxに近づける */
+        transform-origin: left center;
+        width: 114.3%; /* scaleの補正 */
+    }
+    
+    .chat-input-area {
+        /* transformの影響を調整 */
+        padding: 10px 8px;
+    }
+    .typing-indicator {
+    bottom: calc(100% + env(safe-area-inset-bottom, 0px));
+    }
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .chat-container {
+        width: 90%;
+        max-width: 450px;
+        height: 80vh;
+        max-height: 600px;
+        /* border-radiusは維持 */
+        border-radius: 20px;
+    }
+    
+    .chat-modal {
+        /* align-items: stretch; を削除 */
+        align-items: center;
+        justify-content: center;
+        padding: 20px; /* 画面端からの余白を追加 */
+    }
+        .typing-indicator {
+        font-size: 11px;
+        padding: 6px 10px;
+        left: 8px;
+        right: 8px;
+    }
+}
+
+/* さらに小さい画面用の調整 */
+@media (max-width: 480px) {
+    .chat-container {
+        width: calc(100% - 40px); /* 左右20pxずつの余白 */
+        max-width: none;
+        height: 70vh; /* 少し小さめに */
+        max-height: 500px;
+    }
+}
+
+/* iOS対応の修正 */
+@supports (-webkit-touch-callout: none) {
+    .chat-container {
+        /* 画面全体ではなく、適切なサイズを維持 */
+        height: min(80vh, 600px);
+        max-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 80px);
+    }
+    
+    .chat-input-area {
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+    }
+    
+    /* スマホでモーダル表示時のスクロール防止 */
+    body.chat-modal-open {
+        position: fixed;
+        width: 100%;
+        overflow: hidden;
+    }
+}
+
+
+
+
+/* ステータスドット共通スタイル */
+.status-indicator {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 共有中（オンライン） */
+.status-indicator.sharing {
+    background: #4caf50;
+    animation: statusPulse 2s infinite;
+}
+
+/* 共有待ち */
+.status-indicator.waiting {
+    background: #ffc107;
+    animation: statusBlink 1.5s infinite;
+}
+
+/* バックグラウンド */
+.status-indicator.background {
+    background: #6c757d;
+}
+
+/* オフライン */
+.status-indicator.offline {
+    background: #dc3545;
+    opacity: 0.7;
+}
+
+@keyframes statusPulse {
+    0%, 100% { box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); }
+    50% { box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.4); }
+}
+
+@keyframes statusBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* ステータステキスト */
+.participant-status {
+    font-size: 11px;
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+.participant-status.sharing {
+    color: #4caf50;
+}
+
+.participant-status.waiting {
+    color: #ffc107;
+}
+
+.participant-status.background {
+    color: #6c757d;
+}
+
+.participant-status.offline {
+    color: #dc3545;
+}
+
+
+
+
+/* セクションラベルの装飾を強化 */
+.chat-section-label {
+    padding: 10px 15px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #495057;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #dee2e6;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* グループセクションの特別な装飾 */
+.chat-section-label.group-section {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    color: #2e7d32;
+    border-bottom: 2px solid #00b300;
+}
+
+.chat-section-label.group-section i {
+    background: #00b300;
+    color: white;
+    padding: 10px 8px;
+    border-radius: 50%;
+    font-size: 10px;
+    box-shadow: 0 2px 4px rgba(0, 179, 0, 0.2);
+}
+
+/* 個別チャットセクションの装飾 */
+.chat-section-label.individual-section {
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+    color: #6a1b9a;
+    border-bottom: 2px solid #9c27b0;
+    margin-top: 10px;
+}
+
+.chat-section-label.individual-section i {
+    background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
+    color: white;
+    padding: 10px 10px;
+    border-radius: 50%;
+    font-size: 10px;
+    box-shadow: 0 2px 4px rgba(156, 39, 176, 0.2);
+}
+
+/* セクションラベルのテキスト装飾 */
+.chat-section-label span {
+    flex: 1;
+    position: relative;
+}
+
+/* セクションラベルの右側に装飾線 */
+.chat-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, currentColor, transparent);
+    opacity: 0.2;
+    margin-left: 10px;
+}
+
+/* セクション間の間隔 */
+.chat-participant-item.group {
+    margin-bottom: 8px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* グループチャット項目のホバー効果 */
+.chat-participant-item.group:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 179, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+/* 個別チャット項目の境界線 */
+.chat-participant-item:not(.group) {
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.chat-participant-item:not(.group):hover {
+    border-left: 3px solid #9c27b0;
+    background: linear-gradient(90deg, rgba(156, 39, 176, 0.05) 0%, transparent 100%);
+}
+    /* 移動軌跡のアニメーション */
+    @keyframes dashFlow {
+        0% { stroke-dashoffset: 15; }
+        100% { stroke-dashoffset: 0; }
+    }
+    
+    /* 方向矢印のアニメーション */
+    .direction-arrow {
+        transition: opacity 0.3s ease-in-out;
+    }
+    
+    /* マーカー移動時のスムーズな遷移 */
+    .custom-marker {
+        transition: transform 0.1s ease-out;
+    }
+    
+    /* 移動軌跡のスタイル */
+    .movement-trail {
+        pointer-events: none !important;
+    }
+
+    @media (max-width: 375px) {
+    /* 設定カード内のボタン調整 */
+    #toggle-sharing, #reset-view, #leave-session {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+    
+    #toggle-sharing i, #reset-view i, #leave-session i {
+        font-size: 12px;
+        margin-right: 2px;
+    }
+    
+    /* ボタンのテキストを省略形に */
+    #toggle-sharing span {
+        display: inline;
+    }
+    
+    
+    /* ボタン間の余白調整 */
+    #reset-view, #leave-session {
+        margin-left: 4px !important;
+    }
+    
+    /* チャットコンテナ全体のサイズ調整 */
+    .chat-container {
+        width: calc(100% - 30px); /* 左右15pxずつの余白 */
+        height: 75vh; /* 高さも少し減らす */
+        max-height: 480px;
+    }
+    
+    /* ヘッダーのコンパクト化 */
+    .chat-header {
+        padding: 12px;
+    }
+    
+    .chat-header h5 {
+        font-size: 16px;
+    }
+    
+    .back-btn, .close-btn {
+        font-size: 18px;
+        padding: 4px 8px;
+    }
+    
+    /* 参加者リストの調整 */
+    .chat-participant-item {
+        padding: 12px;
+    }
+    
+    .participant-avatar {
+        width: 40px;
+        height: 40px;
+        margin-right: 12px;
+        font-size: 14px;
+    }
+    
+    .participant-name {
+        font-size: 14px;
+    }
+    
+    .last-message {
+        font-size: 12px;
+    }
+    
+    /* メッセージエリアの調整 */
+    .chat-messages {
+        padding: 12px;
+    }
+    
+    .message-bubble {
+        max-width: 75%;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    
+    /* 入力エリアの最適化 */
+    .chat-input-area {
+        padding: 8px;
+        gap: 8px; /* ボタンと入力欄の間隔を縮小 */
+    }
+    
+    /* 入力フィールドの調整 */
+    .chat-input {
+        flex: 1;
+        padding: 8px 12px;
+        font-size: 16px; /* iOSズーム防止のため16px維持 */
+        border-radius: 20px;
+        min-width: 0; /* flexboxでの圧縮を許可 */
+    }
+    
+    /* 送信ボタンの円形維持とサイズ調整 */
+    .send-btn {
+        width: 36px !important; /* 強制的に正方形を維持 */
+        height: 36px !important;
+        min-width: 36px; /* 最小幅を保証 */
+        flex-shrink: 0; /* 縮小を防ぐ */
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+    
+    .send-btn i {
+        font-size: 14px; /* アイコンサイズも調整 */
+    }
+    
+    /* 入力中インジケーターの調整 */
+    .typing-indicator {
+        font-size: 10px;
+        padding: 5px 8px;
+    }
+    
+    /* セクションラベルの調整 */
+    .chat-section-label {
+        padding: 8px 12px;
+        font-size: 10px;
+    }
+    
+    /* バッジの調整 */
+    .unread-badge {
+        font-size: 10px;
+        padding: 1px 5px;
+        min-width: 16px;
+    }
+    
+    /* システムメッセージの調整 */
+    .system-message {
+        font-size: 11px;
+        padding: 4px;
+    }
+}
+
+/* さらに小さい画面（320px以下）用の追加調整 */
+@media (max-width: 320px) {
+    /* 設定カード内のボタンをさらにコンパクトに */
+    #toggle-sharing, #reset-view, #leave-session {
+        font-size: 11px;
+        padding: 5px 8px;
+    }
+    
+    #toggle-sharing i, #reset-view i, #leave-session i {
+        font-size: 11px;
+        margin-right: 1px;
+    }
+    
+    /* ボタン間の余白を最小に */
+    #reset-view, #leave-session {
+        margin-left: 2px !important;
+    }
+    
+    .chat-container {
+        width: calc(100% - 20px); /* 左右10pxずつ */
+        height: 70vh;
+        max-height: 450px;
+    }
+    
+    /* さらにコンパクトな入力エリア */
+    .chat-input-area {
+        padding: 6px;
+        gap: 6px;
+    }
+    
+    .chat-input {
+        padding: 7px 10px;
+        border-radius: 18px;
+    }
+    
+    /* 送信ボタンをさらに小さく、でも円形維持 */
+    .send-btn {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px;
+    }
+    
+    .send-btn i {
+        font-size: 12px;
+    }
+    
+    /* アバターサイズの縮小 */
+    .participant-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 12px;
+    }
+    
+    /* メッセージバブルの調整 */
+    .message-bubble {
+        max-width: 80%; /* 狭い画面では少し広げる */
+        font-size: 13px;
+    }
+}
+
+/* iOS対応の追加修正 */
+@supports (-webkit-touch-callout: none) {
+    @media (max-width: 375px) {
+        /* iOS用のtransform調整を無効化 */
+        .chat-input {
+            transform: none !important;
+            width: 100% !important;
+        }
+        
+        /* Safe Areaを考慮 */
+        .chat-input-area {
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+        }
+    }
+}
+
+/* フレックスボックスの最適化 */
+@media (max-width: 375px) {
+    /* 設定エリアのレイアウト調整 */
+    .card-body .row {
+        margin: 0 -5px; /* 左右のガターを縮小 */
+    }
+    
+    .card-body .col-md-6 {
+        padding: 0 5px;
+    }
+    
+    /* ラベルのフォントサイズ調整 */
+    .card-body .form-label {
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+    
+    /* 表示名入力欄の調整 */
+    #participant-name {
+        font-size: 14px;
+        padding: 6px 10px;
+    }
+    
+    /* ボタングループのコンテナ調整 */
+    .col-md-6 > div {
+        display: flex;
+        flex-wrap: nowrap; /* 横並びを強制 */
+        gap: 4px;
+    }
+    
+    /* ヘルプテキストの調整 */
+    #sharing-help {
+        font-size: 11px;
+        margin-top: 4px;
+    }
+    
+    .chat-input-area {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    /* 入力フィールドが圧縮されすぎないように */
+    .chat-input {
+        flex: 1 1 auto;
+        min-width: calc(100% - 50px); /* 送信ボタンとgapの分を引く */
+    }
+    
+    /* 送信ボタンの配置を固定 */
+    .send-btn {
+        flex: 0 0 auto;
+        margin-left: auto; /* 右端に配置 */
+    }
+}
+
+/* アニメーションの軽量化（パフォーマンス向上） */
+@media (max-width: 375px) {
+    /* 設定カード全体の調整 */
+    .card {
+        margin-bottom: 10px;
+    }
+    
+    .card-header {
+        padding: 10px;
+    }
+    
+    .card-header h5, .card-header h6 {
+        font-size: 14px;
+    }
+    
+    .card-body {
+        padding: 10px;
+    }
+    
+    /* ステータス表示の調整 */
+    .card-body small.text-muted {
+        font-size: 11px;
+    }
+    
+    #location-status, #visibility-status {
+        font-size: 12px;
+    }
+    
+    .chat-modal {
+        animation-duration: 0.15s; /* アニメーションを短く */
+    }
+    
+    .chat-container {
+        animation-duration: 0.2s;
+    }
+    
+    .message {
+        animation: none; /* メッセージアニメーションを無効化 */
+    }
+    
+    /* ホバーエフェクトをタップ時のみに */
+    .chat-participant-item:hover {
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .chat-participant-item:active {
+        background: #f0f0f0;
+    }
+
+    @keyframes slideUp {
+    from {
+        transform: translateX(-50%) translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+.new-message-indicator:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+}
+}
+
+@keyframes slideUpCenter {
+    from {
+        transform: translateX(-50%) translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script nonce="{{ nonce }}">
+    // セキュリティ強化: XSS対策とデータ検証
+    window.djangoData = {
+        sessionId: "{{ session.session_id|escapejs|safe }}",
+        participantId: "{{ participant_id|escapejs|safe }}",
+        expiresAt: "{{ expires_at|date:'c'|escapejs|safe }}",
+        csrfToken: "{{ csrf_token|escapejs|safe }}",
+        websocketUrl: "{{ websocket_url|escapejs|safe }}"
+    };
+</script>
+
+<script src="{% static 'js/common.js' %}" nonce="{{ nonce }}"></script>
+<script src="{% static 'js/location-sharing.js' %}" nonce="{{ nonce }}"></script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+
+{% endblock %}

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お問い合わせ通知</title>
+    <style>
+        body {
+            font-family: 'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin: -30px -30px 30px -30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .alert {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .info-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+        .info-label {
+            font-weight: bold;
+            min-width: 120px;
+            color: #495057;
+            margin-right: 15px;
+        }
+        .info-value {
+            flex: 1;
+            word-wrap: break-word;
+        }
+        .message-content {
+            background-color: white;
+            border: 1px solid #dee2e6;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            font-family: inherit;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .timestamp {
+            color: #007bff;
+            font-weight: bold;
+        }
+        .priority-high {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .priority-normal {
+            color: #28a745;
+        }
+        .category-tag {
+            background-color: #007bff;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>📧 新しいお問い合わせ</h1>
+            <p style="margin: 5px 0 0 0;">Location Share システム</p>
+        </div>
+
+        <div class="alert">
+            <strong>⚠️ 新しいお問い合わせが届きました</strong><br>
+            以下の内容をご確認の上、適切な対応をお願いいたします。
+        </div>
+
+        <div class="info-section">
+            <h3 style="margin-top: 0; color: #495057;">📋 お問い合わせ詳細</h3>
+            
+            <div class="info-row">
+                <span class="info-label">受信日時:</span>
+                <span class="info-value timestamp">{{ submitted_at|date:"Y年m月d日 H:i:s" }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">お名前:</span>
+                <span class="info-value">{{ name }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">メールアドレス:</span>
+                <span class="info-value">{{ email }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">カテゴリ:</span>
+                <span class="info-value">
+                    <span class="category-tag">{{ category }}</span>
+                </span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">件名:</span>
+                <span class="info-value"><strong>{{ subject }}</strong></span>
+            </div>
+
+            {% if priority %}
+            <div class="info-row">
+                <span class="info-label">優先度:</span>
+                <span class="info-value {% if priority == 'high' %}priority-high{% else %}priority-normal{% endif %}">
+                    {% if priority == 'high' %}🔴 高{% else %}🟢 通常{% endif %}
+                </span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="info-section">
+            <h3 style="margin-top: 0; color: #495057;">📝 お問い合わせ内容</h3>
+            <div class="message-content">{{ message }}</div>
+        </div>
+
+        {% if ip_address or user_agent %}
+        <div class="info-section">
+            <h3 style="margin-top: 0; color: #495057;">🔧 技術情報</h3>
+            
+            {% if ip_address %}
+            <div class="info-row">
+                <span class="info-label">IPアドレス:</span>
+                <span class="info-value">{{ ip_address }}</span>
+            </div>
+            {% endif %}
+            
+            {% if user_agent %}
+            <div class="info-row">
+                <span class="info-label">ユーザーエージェント:</span>
+                <span class="info-value" style="font-size: 12px;">{{ user_agent }}</span>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="footer">
+            <p><strong>📌 対応について</strong></p>
+            <ul style="margin: 10px 0; padding-left: 20px;">
+                <li>お客様への返信は <strong>{{ email }}</strong> 宛てに送信してください</li>
+                <li>緊急度の高いお問い合わせの場合は、迅速な対応をお願いします</li>
+                <li>このメールは自動送信されています</li>
+            </ul>
+            
+            <hr style="border: none; border-top: 1px solid #dee2e6; margin: 20px 0;">
+            <p style="text-align: center; color: #6c757d; font-size: 12px;">
+                Location Share System - 管理者通知メール<br>
+                Generated at {{ submitted_at|date:"Y-m-d H:i:s" }}
+            </p>
+        </div>
+    </div>
+</body>
+</html>

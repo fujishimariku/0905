@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お問い合わせありがとうございます</title>
+    <style>
+        body {
+            font-family: 'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .email-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            border-radius: 10px;
+            margin: -30px -30px 30px -30px;
+        }
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            font-weight: 300;
+        }
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        .thank-you-message {
+            background-color: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+        .thank-you-message h2 {
+            color: #155724;
+            margin: 0 0 10px 0;
+            font-size: 20px;
+        }
+        .info-box {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 12px;
+            align-items: flex-start;
+        }
+        .info-label {
+            font-weight: bold;
+            min-width: 100px;
+            color: #495057;
+            margin-right: 15px;
+        }
+        .info-value {
+            flex: 1;
+            word-wrap: break-word;
+        }
+        .inquiry-content {
+            background-color: #fff;
+            border: 2px solid #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: inherit;
+        }
+        .next-steps {
+            background-color: #cce7ff;
+            border-left: 5px solid #007bff;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+        .next-steps h3 {
+            color: #004085;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+        .next-steps ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .next-steps li {
+            margin-bottom: 8px;
+        }
+        .contact-info {
+            background-color: #f1f3f4;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+        .contact-info h3 {
+            color: #495057;
+            margin: 0 0 15px 0;
+            font-size: 16px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 2px solid #e9ecef;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .logo-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .timestamp {
+            color: #007bff;
+            font-weight: bold;
+        }
+        .category-badge {
+            background-color: #007bff;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            display: inline-block;
+        }
+        .warning-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            color: #856404;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>✉️ お問い合わせありがとうございます</h1>
+            <p>Location Share システム</p>
+        </div>
+
+        <div class="thank-you-message">
+            <h2>🙏 {{ name }} 様</h2>
+            <p>この度は、Location Share システムにお問い合わせいただき、誠にありがとうございます。<br>
+            お客様からのお問い合わせを正常に受け付けいたしました。</p>
+        </div>
+
+        <div class="info-box">
+            <h3 style="margin-top: 0; color: #495057;">📋 受付内容の確認</h3>
+            
+            <div class="info-row">
+                <span class="info-label">受付日時:</span>
+                <span class="info-value timestamp">{{ submitted_at|date:"Y年m月d日 H:i:s" }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">お名前:</span>
+                <span class="info-value">{{ name }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">メールアドレス:</span>
+                <span class="info-value">{{ email }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">カテゴリ:</span>
+                <span class="info-value">
+                    <span class="category-badge">{{ category }}</span>
+                </span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">件名:</span>
+                <span class="info-value"><strong>{{ subject }}</strong></span>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3 style="margin-top: 0; color: #495057;">📝 お問い合わせ内容</h3>
+            <div class="inquiry-content">{{ message|linebreaks }}</div>
+        </div>
+
+        <div class="next-steps">
+            <h3>📬 今後の流れについて</h3>
+            <ul>
+                <li><strong>確認・調査:</strong> 担当者がお客様のお問い合わせ内容を確認・調査いたします</li>
+                <li><strong>回答期間:</strong> 通常<span class="highlight">2-3営業日以内</span>にご回答いたします</li>
+                <li><strong>緊急案件:</strong> 緊急性の高い内容については、可能な限り迅速に対応いたします</li>
+                <li><strong>回答方法:</strong> {{ email }} 宛てにご回答メールを送信いたします</li>
+            </ul>
+        </div>
+
+        <div class="warning-box">
+            <strong>⚠️ ご注意ください</strong><br>
+            • このメールは自動送信されています。このメールに直接返信しても回答できません<br>
+            • 追加のご質問がある場合は、改めてお問い合わせフォームよりご連絡ください<br>
+            • 迷惑メールフォルダに振り分けられていないかご確認ください
+        </div>
+
+        <div class="logo-section">
+            <div style="font-size: 48px; margin: 20px 0;">📍</div>
+            <h3 style="color: #007bff; margin: 0;">Location Share System</h3>
+            <p style="color: #6c757d; margin: 5px 0 0 0;">安全で便利な位置情報共有サービス</p>
+        </div>
+
+        <div class="footer">
+            <p><strong>今後ともLocation Share システムをよろしくお願いいたします。</strong></p>
+            <hr style="border: none; border-top: 1px solid #dee2e6; margin: 20px 0;">
+            <p style="font-size: 12px; color: #6c757d;">
+                このメールは <strong>{{ submitted_at|date:"Y-m-d H:i:s" }}</strong> に自動送信されました<br>
+                Location Share System - お問い合わせ自動返信メール
+            </p>
+        </div>
+    </div>
+</body>
+</html>

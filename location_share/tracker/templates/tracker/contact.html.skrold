@@ -1,0 +1,315 @@
+<!-- tracker/templates/tracker/contact.html -->
+{% extends 'tracker/base.html' %}
+{% load static %}
+
+{% block title %}お問い合わせ - ちょいシェアMAP{% endblock %}
+
+{% block content %}
+<div class="contact-header text-center">
+    <div class="container">
+        <h1><i class="fas fa-envelope"></i> お問い合わせ</h1>
+        <p class="lead">ご質問やご意見がございましたら、お気軽にお問い合わせください。</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title mb-4">
+                    <i class="fas fa-paper-plane text-primary"></i> メッセージを送信
+                </h3>
+                
+                <form method="post" id="contactForm" class="contact-form">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="name" name="name" placeholder="お名前" required>
+                                <label for="name">
+                                    <i class="fas fa-user"></i> お名前 <span class="text-danger">*</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="form-floating">
+                                <input type="email" class="form-control" id="email" name="email" placeholder="メールアドレス" required>
+                                <label for="email">
+                                    <i class="fas fa-envelope"></i> メールアドレス <span class="text-danger">*</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-floating">
+                            <select class="form-select" id="subject_category" name="subject_category" required>
+                                <option value="">選択してください</option>
+                                <option value="technical">技術的な問題</option>
+                                <option value="feature">機能に関するご要望</option>
+                                <option value="bug">バグ報告</option>
+                                <option value="general">一般的なお問い合わせ</option>
+                                <option value="other">その他</option>
+                            </select>
+                            <label for="subject_category">
+                                <i class="fas fa-tag"></i> お問い合わせ種類 <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="subject" name="subject" placeholder="件名">
+                            <label for="subject">
+                                <i class="fas fa-heading"></i> 件名
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-floating">
+                            <textarea class="form-control" id="message" name="message" style="height: 150px" placeholder="メッセージ" required></textarea>
+                            <label for="message">
+                                <i class="fas fa-comment"></i> メッセージ <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                        <div class="form-text">詳細な内容をお書きください。バグ報告の場合は、使用環境も併せてお知らせください。</div>
+                    </div>
+                    
+                    <!-- 使用環境情報（自動取得） -->
+                    <input type="hidden" id="user_agent" name="user_agent">
+                    <input type="hidden" id="screen_resolution" name="screen_resolution">
+                    <input type="hidden" id="browser_language" name="browser_language">
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                            <i class="fas fa-paper-plane"></i> 送信する
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="contact-info">
+            <div class="contact-icon">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <h5>お問い合わせについて</h5>
+            <p class="text-muted">
+                ちょいシェアMAPに関するご質問、ご意見、バグ報告などをお気軽にお送りください。
+                いただいたメッセージには、できるだけ早くご返信いたします。
+            </p>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="fas fa-clock text-primary"></i> よくあるお問い合わせ
+                </h6>
+                <ul class="list-unstyled mt-3">
+                    <li class="mb-2">
+                        <i class="fas fa-question-circle text-muted me-2"></i>
+                        <strong>位置情報が取得できない</strong><br>
+                        <small class="text-muted">ブラウザの位置情報許可設定をご確認ください</small>
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-question-circle text-muted me-2"></i>
+                        <strong>地図が表示されない</strong><br>
+                        <small class="text-muted">インターネット接続とJavaScriptの有効化をご確認ください</small>
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-question-circle text-muted me-2"></i>
+                        <strong>共有リンクが開けない</strong><br>
+                        <small class="text-muted">リンクが正しく、有効期限内かご確認ください</small>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 送信成功モーダル -->
+<div class="modal fade" id="successModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle"></i> 送信完了
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>お問い合わせありがとうございます！</p>
+                <p>メッセージを正常に送信いたしました。内容を確認次第、ご返信させていただきます。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 使用環境情報を自動取得
+    document.getElementById('user_agent').value = navigator.userAgent;
+    document.getElementById('screen_resolution').value = screen.width + 'x' + screen.height;
+    document.getElementById('browser_language').value = navigator.language;
+    
+    // フォーム送信処理
+    const form = document.getElementById('contactForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // ボタンを無効化して二重送信を防止
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 送信中...';
+        
+        // フォームデータを取得
+        const formData = new FormData(form);
+        
+        // Fetch APIで送信
+        fetch('{% url "tracker:contact" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 成功時の処理
+                //showCustomAlert(data.message, '送信完了', 'success');
+                form.reset();
+                
+                // モーダルを表示
+                const modal = new bootstrap.Modal(document.getElementById('successModal'));
+                modal.show();
+            } else {
+                // エラー時の処理
+                showCustomAlert(data.message || 'エラーが発生しました', '送信エラー', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showCustomAlert('通信エラーが発生しました。しばらく時間をおいて再度お試しください。', '通信エラー', 'error');
+        })
+        .finally(() => {
+            // ボタンを元に戻す
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 送信する';
+        });
+    });
+    
+    // リアルタイムバリデーション
+    const requiredFields = ['name', 'email', 'subject_category', 'message'];
+    
+    requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        field.addEventListener('blur', function() {
+            validateField(field);
+        });
+        
+        field.addEventListener('input', function() {
+            if (field.classList.contains('is-invalid')) {
+                validateField(field);
+            }
+        });
+    });
+    
+    function validateField(field) {
+        const value = field.value.trim();
+        
+        // 必須フィールドチェック
+        if (!value) {
+            field.classList.add('is-invalid');
+            field.classList.remove('is-valid');
+            return false;
+        }
+        
+        // メールアドレス形式チェック
+        if (field.type === 'email') {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                field.classList.add('is-invalid');
+                field.classList.remove('is-valid');
+                return false;
+            }
+        }
+        
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+        return true;
+    }
+    
+    // 文字数カウンター（メッセージフィールド）
+    const messageField = document.getElementById('message');
+    const maxLength = 2000;
+    
+    // カウンター要素を作成
+    const counterElement = document.createElement('div');
+    counterElement.className = 'form-text text-end';
+    counterElement.id = 'messageCounter';
+    messageField.parentNode.appendChild(counterElement);
+    
+    function updateCounter() {
+        const currentLength = messageField.value.length;
+        counterElement.textContent = `${currentLength}/${maxLength}文字`;
+        
+        if (currentLength > maxLength * 0.9) {
+            counterElement.classList.add('text-warning');
+        } else {
+            counterElement.classList.remove('text-warning');
+        }
+        
+        if (currentLength > maxLength) {
+            counterElement.classList.add('text-danger');
+            messageField.classList.add('is-invalid');
+        } else {
+            counterElement.classList.remove('text-danger');
+            if (messageField.classList.contains('is-invalid') && currentLength > 0) {
+                messageField.classList.remove('is-invalid');
+                messageField.classList.add('is-valid');
+            }
+        }
+    }
+    
+    messageField.addEventListener('input', updateCounter);
+    updateCounter(); // 初期化
+    
+    // フォームの自動保存（ローカルストレージ）
+    const formFields = ['name', 'email', 'subject_category', 'subject', 'message'];
+    
+    // 保存された内容を復元
+    formFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        const savedValue = localStorage.getItem(`contact_${fieldId}`);
+        if (savedValue) {
+            field.value = savedValue;
+        }
+        
+        // 変更時に保存
+        field.addEventListener('input', function() {
+            localStorage.setItem(`contact_${fieldId}`, field.value);
+        });
+    });
+    
+    // フォーム送信成功時に保存された内容をクリア
+    form.addEventListener('formReset', function() {
+        formFields.forEach(fieldId => {
+            localStorage.removeItem(`contact_${fieldId}`);
+        });
+    });
+});
+</script>
+{% block extra_js %}
+<script src="{% static 'js/common.js' %}" nonce="{{ nonce }}"></script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,473 @@
+INFO 2025-07-22 13:42:48,782 cli 165090 139948401760064 Starting server at tcp:port=8001:interface=127.0.0.1
+INFO 2025-07-22 13:42:48,783 server 165090 139948401760064 HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+INFO 2025-07-22 13:42:48,783 server 165090 139948401760064 Configuring endpoint tcp:port=8001:interface=127.0.0.1
+INFO 2025-07-22 13:42:48,784 server 165090 139948401760064 Listening on TCP address 127.0.0.1:8001
+ERROR 2025-07-22 13:42:59,622 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:42:59,700 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:43:00,322 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:43:00,396 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:43:00,742 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:43:00,802 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:43:02,227 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:43:02,294 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:43:05,674 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:43:05,745 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:43:08,150 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:43:08,465 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+WARNING 2025-07-22 13:43:32,199 log 165090 139948072101440 Not Found: /favicon.ico
+WARNING 2025-07-22 13:43:37,586 log 165090 139948082591296 Forbidden (Origin checking failed - https://52.192.90.62 does not match any trusted origins.): /create/
+WARNING 2025-07-22 13:43:44,307 log 165090 139948082591296 Forbidden (Origin checking failed - https://52.192.90.62 does not match any trusted origins.): /create/
+WARNING 2025-07-22 13:44:22,476 log 165090 139948072101440 Not Found: /favicon.ico
+WARNING 2025-07-22 13:44:24,480 log 165090 139948082591296 Forbidden (Origin checking failed - https://52.192.90.62 does not match any trusted origins.): /create/
+ERROR 2025-07-22 13:45:32,961 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:45:33,043 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:47:39,568 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:47:39,652 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:47:40,235 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:47:40,294 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:47:40,974 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:47:41,060 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:47:41,277 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+ERROR 2025-07-22 13:47:41,344 log 165090 139948072101440 Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/lib64/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/app_admin/location_share/lib64/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'locationsshare.com'. You may need to add 'locationsshare.com' to ALLOWED_HOSTS.
+WARNING 2025-07-22 13:48:27,103 log 165090 139948072101440 Not Found: /robots.txt
+WARNING 2025-07-22 13:48:27,271 log 165090 139948072101440 Not Found: /robots.txt
+WARNING 2025-07-22 13:48:59,797 log 165090 139948082591296 Method Not Allowed (GET): /create/
+WARNING 2025-07-22 13:49:19,870 log 165090 139948082591296 Method Not Allowed (GET): /create/
+WARNING 2025-07-22 13:49:49,205 log 165090 139948082591296 Method Not Allowed (GET): /create/
+WARNING 2025-07-22 13:50:40,111 log 165090 139948082591296 Method Not Allowed (GET): /create/
+WARNING 2025-07-22 13:52:00,376 log 165090 139948082591296 Method Not Allowed (GET): /create/
+INFO 2025-07-22 13:53:31,799 server 165090 139948401760064 Killed 0 pending application instances
+127.0.0.1:58870 - - [22/Jul/2025:13:42:59] "GET /" 400 143
+127.0.0.1:58876 - - [22/Jul/2025:13:42:59] "GET /favicon.ico" 400 143
+127.0.0.1:58888 - - [22/Jul/2025:13:43:00] "GET /" 400 143
+127.0.0.1:58900 - - [22/Jul/2025:13:43:00] "GET /favicon.ico" 400 143
+127.0.0.1:58904 - - [22/Jul/2025:13:43:00] "GET /" 400 143
+127.0.0.1:58916 - - [22/Jul/2025:13:43:00] "GET /favicon.ico" 400 143
+127.0.0.1:58928 - - [22/Jul/2025:13:43:02] "GET /" 400 143
+127.0.0.1:58942 - - [22/Jul/2025:13:43:02] "GET /favicon.ico" 400 143
+127.0.0.1:58952 - - [22/Jul/2025:13:43:05] "GET /" 400 143
+127.0.0.1:58968 - - [22/Jul/2025:13:43:05] "GET /favicon.ico" 400 143
+127.0.0.1:58974 - - [22/Jul/2025:13:43:08] "GET /" 400 143
+127.0.0.1:58978 - - [22/Jul/2025:13:43:08] "GET /favicon.ico" 400 143
+127.0.0.1:45306 - - [22/Jul/2025:13:43:31] "GET /" 200 21159
+127.0.0.1:45320 - - [22/Jul/2025:13:43:32] "GET /favicon.ico" 404 179
+127.0.0.1:45326 - - [22/Jul/2025:13:43:37] "POST /create/" 403 1085
+127.0.0.1:41190 - - [22/Jul/2025:13:43:44] "POST /create/" 403 1085
+127.0.0.1:42432 - - [22/Jul/2025:13:44:22] "GET /" 200 21159
+127.0.0.1:42442 - - [22/Jul/2025:13:44:22] "GET /favicon.ico" 404 179
+127.0.0.1:42448 - - [22/Jul/2025:13:44:24] "POST /create/" 403 1085
+127.0.0.1:37894 - - [22/Jul/2025:13:45:32] "GET /" 400 143
+127.0.0.1:37908 - - [22/Jul/2025:13:45:33] "GET /favicon.ico" 400 143
+127.0.0.1:51946 - - [22/Jul/2025:13:47:39] "GET /" 400 143
+127.0.0.1:51950 - - [22/Jul/2025:13:47:39] "GET /favicon.ico" 400 143
+127.0.0.1:51962 - - [22/Jul/2025:13:47:40] "GET /" 400 143
+127.0.0.1:51976 - - [22/Jul/2025:13:47:40] "GET /favicon.ico" 400 143
+127.0.0.1:51990 - - [22/Jul/2025:13:47:41] "GET /" 400 143
+127.0.0.1:51992 - - [22/Jul/2025:13:47:41] "GET /favicon.ico" 400 143
+127.0.0.1:52008 - - [22/Jul/2025:13:47:41] "GET /" 400 143
+127.0.0.1:52014 - - [22/Jul/2025:13:47:41] "GET /favicon.ico" 400 143
+127.0.0.1:53140 - - [22/Jul/2025:13:48:27] "GET /robots.txt" 404 179
+127.0.0.1:53146 - - [22/Jul/2025:13:48:27] "GET /robots.txt" 404 179
+127.0.0.1:60366 - - [22/Jul/2025:13:48:37] "GET /" 200 21159
+127.0.0.1:60382 - - [22/Jul/2025:13:48:37] "GET /" 200 21159
+127.0.0.1:40036 - - [22/Jul/2025:13:48:59] "GET /create/" 405 -
+127.0.0.1:44066 - - [22/Jul/2025:13:49:19] "GET /create/" 405 -
+127.0.0.1:41620 - - [22/Jul/2025:13:49:49] "GET /create/" 405 -
+127.0.0.1:35782 - - [22/Jul/2025:13:50:40] "GET /create/" 405 -
+127.0.0.1:45638 - - [22/Jul/2025:13:52:00] "GET /create/" 405 -

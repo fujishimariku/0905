@@ -1,0 +1,1301 @@
+{% extends 'tracker/base.html' %}
+{% load static %}
+{% block title %}ちょこシェアMAP - 登録不要で位置情報を一時共有{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 全体的な白基調のデザイン */
+body {
+    background: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ヒーローセクション */
+.hero-section {
+    background: linear-gradient(180deg, #f8fafb 0%, #ffffff 100%);
+    padding: 80px 0 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(99, 179, 237, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(134, 239, 172, 0.06) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #1a202c;
+    margin-bottom: 24px;
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: #64748b;
+    margin-bottom: 40px;
+    line-height: 1.8;
+}
+
+.hero-image {
+    position: relative;
+    margin-top: 40px;
+}
+
+.hero-illustration {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.1));
+}
+
+.phone-mockup {
+    position: absolute;
+    bottom: -20px;
+    right: -30px;
+    width: 200px;
+    height: auto;
+    transform: rotate(-5deg);
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.15));
+}
+
+/* アバウトセクション */
+.about-section {
+    padding: 80px 0;
+    background: #ffffff;
+}
+
+/* セクションタイトル - カラフルな円を追加 */
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a202c;
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    z-index: 1;
+}
+
+/* カラフルな円の装飾 - 最初から位置を固定 */
+.section-title::before {
+    content: '';
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0.15;
+    top: -30px;
+    left: 50%;
+    margin-left: -120px;
+    animation: float 6s ease-in-out infinite;
+    animation-delay: 0s;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0.15;
+    top: -10px;
+    left: 50%;
+    margin-left: 20px;
+    animation: float 6s ease-in-out infinite;
+    animation-delay: 2s;
+}
+
+/* 各セクションで異なる円の色 */
+.section-title::before {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.section-title::after {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.about-section .section-title::before {
+    background: linear-gradient(135deg, #ffc107 0%, #4c40fe 100%);
+}
+
+.about-section .section-title::after {
+    background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+}
+
+.how-to-section .section-title::before {
+    background: linear-gradient(135deg, #0d6efd 0%, #ff79a4 100%);
+}
+
+.how-to-section .section-title::after {
+    background: linear-gradient(135deg, #ff9a9e 0%, #ffe3f6 100%);
+}
+
+.faq-section .section-title::before {
+    background: linear-gradient(135deg, #ff4556 0%, #1eb8d7 100%);
+}
+
+.faq-section .section-title::after {
+    background: linear-gradient(135deg, #ff6bf8 0%, #c2e9fb 100%);
+}
+
+.stats-section .section-title::before {
+    background: linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%);
+}
+
+.stats-section .section-title::after {
+    background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+}
+
+.section-subtitle {
+    font-size: 1.1rem;
+    color: #64748b;
+    text-align: center;
+    margin-bottom: 60px;
+    max-width: 596px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 特徴カード */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 60px;
+}
+
+.feature-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 32px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #e0e7ff 0%, #f0f4f8 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-3px);
+    border-color: #cbd5e1;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    background: #fafbfc;
+}
+
+.feature-card:hover::before {
+    opacity: 1;
+}
+
+.feature-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+    background: linear-gradient(135deg, #ddd6fe 0%, #e0e7ff 100%);
+    transform: scale(1.05);
+}
+
+.feature-icon i {
+    color: #6366f1;
+    font-size: 24px;
+    transition: color 0.3s ease;
+}
+
+.feature-card:hover .feature-icon i {
+    color: #4f46e5;
+}
+
+.feature-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 12px;
+    transition: color 0.3s ease;
+}
+
+.feature-card:hover .feature-title {
+    color: #0f172a;
+}
+
+.feature-description {
+    color: #64748b;
+    line-height: 1.6;
+    transition: color 0.3s ease;
+}
+
+.feature-card:hover .feature-description {
+    color: #475569;
+}
+
+/* 各カードに異なる穏やかなアクセントカラー */
+.feature-card:nth-child(1) .feature-icon {
+    background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+}
+
+.feature-card:nth-child(1) .feature-icon i {
+    color: #0ea5e9;
+}
+
+.feature-card:nth-child(1):hover .feature-icon {
+    background: linear-gradient(135deg, #bae6fd 0%, #e0f2fe 100%);
+}
+
+.feature-card:nth-child(2) .feature-icon {
+    background: linear-gradient(135deg, #fce7f3 0%, #fdf2f8 100%);
+}
+
+.feature-card:nth-child(2) .feature-icon i {
+    color: #ec4899;
+}
+
+.feature-card:nth-child(2):hover .feature-icon {
+    background: linear-gradient(135deg, #fbcfe8 0%, #fce7f3 100%);
+}
+
+.feature-card:nth-child(3) .feature-icon {
+    background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+}
+
+.feature-card:nth-child(3) .feature-icon i {
+    color: #f59e0b;
+}
+
+.feature-card:nth-child(3):hover .feature-icon {
+    background: linear-gradient(135deg, #fde68a 0%, #fef3c7 100%);
+}
+
+.feature-card:nth-child(4) .feature-icon {
+    background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
+}
+
+.feature-card:nth-child(4) .feature-icon i {
+    color: #22c55e;
+}
+
+.feature-card:nth-child(4):hover .feature-icon {
+    background: linear-gradient(135deg, #bbf7d0 0%, #dcfce7 100%);
+}
+
+.feature-card:nth-child(5) .feature-icon {
+    background: linear-gradient(135deg, #e9d5ff 0%, #f3e8ff 100%);
+}
+
+.feature-card:nth-child(5) .feature-icon i {
+    color: #a855f7;
+}
+
+.feature-card:nth-child(5):hover .feature-icon {
+    background: linear-gradient(135deg, #d8b4fe 0%, #e9d5ff 100%);
+}
+
+.feature-card:nth-child(6) .feature-icon {
+    background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+}
+
+.feature-card:nth-child(6) .feature-icon i {
+    color: #6366f1;
+}
+
+.feature-card:nth-child(6):hover .feature-icon {
+    background: linear-gradient(135deg, #c7d2fe 0%, #e0e7ff 100%);
+}
+
+/* 使い方セクション */
+.how-to-section {
+    padding: 80px 0;
+    background: #f8fafb;
+    position: relative;
+    overflow: hidden;
+}
+
+.step-container {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.step-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.step-number {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-right: 24px;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 8px;
+}
+
+.step-description {
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.step-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 24px;
+    top: 48px;
+    width: 1px;
+    height: calc(100% + 20px);
+    background: linear-gradient(180deg, #3b82f6 0%, transparent 100%);
+    opacity: 0.3;
+}
+
+/* FAQ セクション */
+.faq-section {
+    padding: 50px 0;
+    background: #ffffff;
+    position: relative;
+    overflow: hidden;
+}
+
+.faq-container {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.faq-item {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.faq-question {
+    padding: 24px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a202c;
+    transition: background 0.3s ease;
+}
+
+.faq-question:hover {
+    background: #f8fafb;
+}
+
+.faq-icon {
+    color: #64748b;
+    transition: transform 0.3s ease;
+}
+
+.faq-item.active .faq-icon {
+    transform: rotate(180deg);
+}
+
+.faq-answer {
+    padding: 0 24px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.faq-item.active .faq-answer {
+    padding: 0 24px 24px;
+    max-height: 500px;
+}
+
+.faq-answer p {
+    color: #64748b;
+    line-height: 1.8;
+    margin: 0;
+}
+
+/* 統計セクション */
+.stats-section {
+    padding: 80px 0;
+    background: #ffffff;
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+}
+
+.stats-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center;
+    align-items: center;
+    gap: 80px;
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.stat-item {
+    text-align: center;
+    position: relative;
+    flex: 0 0 auto;
+    min-width: 200px;
+}
+
+.stat-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(180deg, transparent, #e5e7eb, transparent);
+}
+
+.stat-number {
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #3b82f6 0%, #52e6ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    display: block;
+}
+
+.stat-label {
+    color: #64748b;
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    display: block;
+}
+
+/* CTA セクション */
+.cta-section {
+    background: #ffffff;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-card {
+    background: linear-gradient(135deg, #f8fafb 0%, #ffffff 100%);
+    border-radius: 24px;
+    padding: 60px 40px;
+    max-width: 600px;
+    margin: 0 auto;
+    border: 1px solid #e5e7eb;
+    position: relative;
+    z-index: 1;
+}
+
+.cta-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 20px;
+}
+
+.cta-description {
+    color: #64748b;
+    margin-bottom: 40px;
+    font-size: 1.1rem;
+}
+
+.btn-start {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+    color: #ffffff;
+    padding: 16px 40px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+    border: none;
+    cursor: pointer;
+}
+
+.btn-start:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
+    color: #ffffff;
+}
+
+.duration-select {
+    background: #ffffff;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    color: #1a202c;
+    margin-bottom: 24px;
+    width: 100%;
+    max-width: 300px;
+    transition: border-color 0.3s ease;
+}
+
+.duration-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+/* フロートアニメーション */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+    }
+    
+    /* モバイルでの装飾円の位置調整 */
+    .section-title::before {
+        width: 80px;
+        height: 80px;
+        margin-left: -80px;
+        top: -20px;
+    }
+    
+    .section-title::after {
+        width: 60px;
+        height: 60px;
+        margin-left: 20px;
+    }
+    
+    .phone-mockup {
+        width: 150px;
+        right: -20px;
+    }
+    
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        flex-direction: row !important;
+        gap: 30px;
+        padding: 0 15px;
+    }
+    
+    .stat-item {
+        min-width: auto;
+        flex: 1;
+    }
+    
+    .stat-item:not(:last-child)::after {
+        right: -15px;
+        height: 40px;
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* さらに小さい画面での調整 */
+    .section-title::before {
+        width: 60px;
+        height: 60px;
+        margin-left: -60px;
+        top: -15px;
+    }
+    
+    .section-title::after {
+        width: 45px;
+        height: 45px;
+        margin-left: 20px;
+        top: -10px;
+    }
+    
+    .stats-grid {
+        gap: 20px;
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+    
+    .stat-item:not(:last-child)::after {
+        right: -10px;
+    }
+}
+
+/* グリッドレイアウトの上書き */
+.stats-grid {
+    display: flex !important;
+    grid-template-columns: unset !important;
+}
+
+/* 374px以下の小画面対応 */
+@media (max-width: 374px) {
+    .stats-grid {
+        gap: 15px;
+        padding: 0 10px;
+    }
+    
+    .stat-item {
+        min-width: 0;
+        flex: 1 1 50%;
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+        white-space: nowrap;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+        white-space: nowrap;
+    }
+    
+    .stat-item:not(:last-child)::after {
+        right: -8px;
+        height: 35px;
+    }
+}
+
+/* 320px以下の極小画面対応 */
+@media (max-width: 320px) {
+    .stats-section {
+        padding: 60px 0;
+    }
+    
+    .stats-grid {
+        gap: 10px;
+    }
+    
+    .stat-number {
+        font-size: 1.1rem;
+    }
+    
+    .stat-label {
+        font-size: 0.65rem;
+        letter-spacing: 0;
+    }
+    
+    .stat-item:not(:last-child)::after {
+        display: none;
+    }
+}
+
+/* アニメーション */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ヒーローセクション -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 hero-content">
+                <h1 class="hero-title fade-in-up">
+                    今だけ、ここだけ<br>
+                    <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">位置情報をシェア</span>
+                </h1>
+                <p class="hero-subtitle fade-in-up">
+                    登録不要・個人情報不要<br>
+                    安心して使える位置情報共有サービス
+                </p>
+                
+                <form method="post" action="{% url 'tracker:create_session' %}" class="fade-in-up">
+                    {% csrf_token %}
+		    <select class="duration-select" name="duration" aria-label="利用時間" required>
+    <option value="15">15分間</option>
+    <option value="30" selected>30分間</option>
+    <option value="60">1時間</option>
+    <option value="120">2時間</option>
+    <option value="240">4時間</option>
+    <option value="480">8時間</option>
+    <option value="720">12時間</option>
+</select>
+                    <br>
+                    <button type="submit" class="btn-start">
+                        <i class="fas fa-map-marker-alt"></i>
+                        待ち合わせを始める
+                    </button>
+                </form>
+            </div>
+            <div class="col-lg-6 hero-image">
+                <svg class="hero-illustration" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+                    <!-- 地図の背景 -->
+                    <rect x="50" y="50" width="400" height="300" rx="20" fill="#f0f4f8"/>
+                    
+                    <!-- 道路 -->
+                    <path d="M100 150 L400 150" stroke="#e2e8f0" stroke-width="8" stroke-linecap="round"/>
+                    <path d="M250 50 L250 350" stroke="#e2e8f0" stroke-width="8" stroke-linecap="round"/>
+                    <path d="M150 250 L350 250" stroke="#e2e8f0" stroke-width="8" stroke-linecap="round"/>
+                    
+                    <!-- 位置マーカー1 -->
+                    <g transform="translate(180, 120)">
+                        <circle cx="0" cy="0" r="30" fill="#3b82f6" opacity="0.2"/>
+                        <circle cx="0" cy="0" r="20" fill="#3b82f6" opacity="0.4"/>
+                        <path d="M-15,-20 C-15,-28 -8,-35 0,-35 C8,-35 15,-28 15,-20 C15,-12 0,5 0,5 C0,5 -15,-12 -15,-20Z" fill="#3b82f6"/>
+                        <circle cx="0" cy="-20" r="6" fill="white"/>
+                    </g>
+                    
+                    <!-- 位置マーカー2 -->
+                    <g transform="translate(320, 180)">
+                        <circle cx="0" cy="0" r="30" fill="#10b981" opacity="0.2"/>
+                        <circle cx="0" cy="0" r="20" fill="#10b981" opacity="0.4"/>
+                        <path d="M-15,-20 C-15,-28 -8,-35 0,-35 C8,-35 15,-28 15,-20 C15,-12 0,5 0,5 C0,5 -15,-12 -15,-20Z" fill="#10b981"/>
+                        <circle cx="0" cy="-20" r="6" fill="white"/>
+                    </g>
+                    
+                    <!-- 位置マーカー3 -->
+                    <g transform="translate(250, 280)">
+                        <circle cx="0" cy="0" r="30" fill="#f59e0b" opacity="0.2"/>
+                        <circle cx="0" cy="0" r="20" fill="#f59e0b" opacity="0.4"/>
+                        <path d="M-15,-20 C-15,-28 -8,-35 0,-35 C8,-35 15,-28 15,-20 C15,-12 0,5 0,5 C0,5 -15,-12 -15,-20Z" fill="#f59e0b"/>
+                        <circle cx="0" cy="-20" r="6" fill="white"/>
+                    </g>
+                    
+                    <!-- 点線で繋ぐ -->
+                    <path d="M180,120 L320,180 L250,280" stroke="#64748b" stroke-width="2" stroke-dasharray="5,5" fill="none" opacity="0.5"/>
+                </svg>
+                
+                <!-- スマホのモックアップ -->
+<svg class="phone-mockup" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="10" width="180" height="380" rx="20" fill="#1a202c"/>
+    <rect x="20" y="40" width="160" height="320" rx="10" fill="#ffffff"/>
+    
+    <!-- 画面内の地図表示 -->
+    <rect x="30" y="80" width="140" height="200" rx="5" fill="#f0f4f8"/>
+    
+    <!-- 道路 -->
+    <path d="M50 130 L150 130" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round"/>
+    <path d="M100 100 L100 250" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round"/>
+    <path d="M60 180 L140 180" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round"/>
+    <path d="M70 220 L130 220" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- 建物（四角形） -->
+    <rect x="55" y="105" width="20" height="20" rx="2" fill="#cbd5e1"/>
+    <rect x="125" y="105" width="20" height="20" rx="2" fill="#cbd5e1"/>
+    <rect x="55" y="155" width="20" height="20" rx="2" fill="#cbd5e1"/>
+    <rect x="125" y="185" width="20" height="20" rx="2" fill="#cbd5e1"/>
+    <rect x="85" y="230" width="30" height="15" rx="2" fill="#cbd5e1"/>
+    
+    <!-- 公園（緑地） -->
+    <circle cx="130" cy="150" r="12" fill="#86efac" opacity="0.3"/>
+    <circle cx="70" cy="200" r="10" fill="#86efac" opacity="0.3"/>
+    
+    <!-- メインの位置マーカー（中央） -->
+<g transform="translate(100, 180)">
+    <!-- <circle cx="0" cy="0" r="12" fill="#fbbf24" opacity="0.2"/>
+    <circle cx="0" cy="0" r="8" fill="#fbbf24" opacity="0.4"/> -->
+    <path d="M-12,-15 C-12,-21 -6,-27 0,-27 C6,-27 12,-21 12,-15 C12,-9 0,3 0,3 C0,3 -12,-9 -12,-15Z" fill="#fbbf24"/>
+    <circle cx="0" cy="-15" r="4.5" fill="white"/>
+</g>
+    
+    <!-- 他の参加者の位置マーカー -->
+<g transform="translate(75, 145)">
+    <circle cx="0" cy="0" r="10" fill="#10b981" opacity="0.2"/>
+    <circle cx="0" cy="0" r="6" fill="#10b981" opacity="0.4"/>
+    <circle cx="0" cy="0" r="4" fill="#10b981"/>
+    <circle cx="0" cy="0" r="2" fill="white"/>
+</g>
+
+<g transform="translate(120, 210)">
+    <circle cx="0" cy="0" r="10" fill="#0bd7f5" opacity="0.2"/>
+    <circle cx="0" cy="0" r="6" fill="#0bd7f5" opacity="0.4"/>
+    <circle cx="0" cy="0" r="4" fill="#0bd7f5"/>
+    <circle cx="0" cy="0" r="2" fill="white"/>
+</g>
+    
+    <!-- 点線で接続 -->
+<path d="M75,145 L100,180" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3,3" fill="none" opacity="0.4"/>
+<path d="M100,180 L120,210" stroke="#0bd7f5" stroke-width="1.5" stroke-dasharray="3,3" fill="none" opacity="0.4"/>
+    
+<!-- 上部のステータスバー -->
+<rect x="30" y="50" width="140" height="25" rx="3" fill="#f8fafb"/>
+
+<!-- マップ（左） -->
+<text x="50" y="67" font-family="Arial" font-size="8" fill="#64748b" text-anchor="middle">マップ</text>
+
+<!-- 残り時間（中央） -->
+<text x="100" y="67" font-family="Arial" font-size="8" fill="#64748b" text-anchor="middle">残り時間:00:28:45</text>
+
+<!-- チャットアイコン（右） - 緑色の丸に白い丸っこい吹き出し -->
+<g transform="translate(150, 62)">
+    <circle cx="0" cy="0" r="8" fill="#10b981"/>
+    <ellipse cx="0" cy="-1" rx="4" ry="3" fill="white"/>
+    <path d="M-1,2 L0,4 L1,2" fill="white"/>
+    <circle cx="6" cy="-6" r="4" fill="#ef4444"/>
+    <text x="6" y="-4" font-family="Arial" font-size="6" fill="#ffffff" text-anchor="middle">2</text>
+</g>
+    
+<!-- 下部のボタンエリア -->
+<rect x="30" y="285" width="140" height="65" rx="5" fill="#ffffff"/>
+
+<!-- 3つのボタンを横並びに配置 -->
+<rect x="35" y="310" width="40" height="25" rx="8" fill="#10b981"/>
+<text x="55" y="326" font-family="Arial" font-size="7" fill="#ffffff" text-anchor="middle">共有開始</text>
+
+<rect x="80" y="310" width="40" height="25" rx="8" fill="#0bd7f5"/>
+<text x="100" y="326" font-family="Arial" font-size="7" fill="#ffffff" text-anchor="middle">全体表示</text>
+
+<rect x="125" y="310" width="40" height="25" rx="8" fill="#ef4444"/>
+<text x="145" y="326" font-family="Arial" font-size="7" fill="#ffffff" text-anchor="middle">退出</text>
+</svg>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ちょこシェアMAPとは -->
+<section class="about-section">
+    <div class="container">
+        <h2 class="section-title">ちょこシェアMAPとは</h2>
+        <p class="section-subtitle">
+           「ちょこシェアMAP」は、アプリやアカウント登録が不要で、URLを送るだけで使える一時的な位置情報共有サービスです。複雑な操作は一切なく、グループでの利用も人数無制限。誰でもすぐに利用できます。
+        </p>
+        
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <p style="color: #64748b; font-size: 1.1rem; line-height: 1.8; text-align: center;">
+                     - 今だけ伝えたい場所がある方へ。すぐに・安全に、あとくされなく。&nbsp;監視じゃない、信頼の位置共有 -
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- サービスの特徴 -->
+<section class="how-to-section">
+    <div class="container">
+        <h2 class="section-title">サービスの特徴</h2>
+        <p class="section-subtitle">
+            最大の特長はプライバシー重視の仕組み。安心して使える理由があります。
+        </p>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-user-secret"></i>
+                </div>
+                <h3 class="feature-title">完全匿名・登録不要</h3>
+                <p class="feature-description">
+                    メールアドレスも電話番号も不要。個人情報を一切登録せずに利用できます。
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3 class="feature-title">時間制限で自動終了</h3>
+                <p class="feature-description">
+                    設定した時間で自動的に共有が終了。以降アクセスしても位置情報が表示されることはありません。
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h3 class="feature-title">安心設計位置共有</h3>
+                <p class="feature-description">
+                    ページを表示している間だけ現在地を送信。<br>ページ切り替え、画面OFF時に即座に共有が停止。手動で「共有開始」「共有停止」を切り替えることも可能です。
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3 class="feature-title">チャット機能</h3>
+                <p class="feature-description">
+                    待ち合わせ中にメッセージのやり取りが可能。スムーズなコミュニケーションを実現。グループと個人チャットの両方に対応しています。
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="feature-title">複数人での共有</h3>
+                <p class="feature-description">
+                    何人でも参加可能。グループでの利用も簡単です。大人数のイベントや集まりにも最適。
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3 class="feature-title">マルチデバイス対応</h3>
+                <p class="feature-description">
+                    スマホ、タブレット、PCなど、ブラウザがあればどこからでもアクセス可能。※PCの場合、GPSがないため位置情報の精度が低くなる場合があります。
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- 使い方 -->
+<section class="about-section">
+    <div class="container">
+        <h2 class="section-title">使い方</h2>
+        <p class="section-subtitle">
+            たった4ステップで位置情報の共有を開始
+        </p>
+        
+        <div class="step-container">
+            <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3 class="step-title">共有時間を選択</h3>
+                    <p class="step-description">
+                        15分から12時間まで、用途に合わせて共有時間を選択します。短時間の待ち合わせから、一日がかりのイベントまで対応可能です。
+                    </p>
+                </div>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3 class="step-title">共有URLを送信</h3>
+                    <p class="step-description">
+                        自動生成されたURLをLINEやメールで友達に送信します。URLを知っている人だけが参加できる仕組みです。
+                    </p>
+                </div>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3 class="step-title">位置情報を許可</h3>
+                    <p class="step-description">
+                        参加者はブラウザで位置情報の利用を許可するだけ。
+                    </p>
+                </div>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3 class="step-title">マップで確認</h3>
+                    <p class="step-description">
+                        参加者全員の位置がマップ上に表示されます。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- よくあるご質問 -->
+<section class="faq-section">
+    <div class="container">
+        <h2 class="section-title">よくあるご質問</h2>
+        <p class="section-subtitle">
+            ちょこシェアMAPについての疑問にお答えします
+        </p>
+        
+        <div class="faq-container">
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>本当に登録は不要ですか？</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        はい、完全に登録不要です。メールアドレス、電話番号、名前など、一切の個人情報を入力する必要はありません。URLを共有するだけですぐに使い始められます。
+                    </p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>位置情報はいつまで共有されますか？</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        設定した共有時間が終了するまでです。プライバシーを最優先に設計しています。
+                    </p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>何人まで同時に利用できますか？</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        人数制限はありません。URLを知っている人なら何人でも参加可能です。大人数のイベントや団体での利用にも対応しています。
+                    </p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>スマートフォン以外でも使えますか？</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        はい、ご利用いただけます。スマートフォン、タブレット、パソコンなど、インターネットに接続された端末で、ブラウザが使用可能であればご利用いただけます。推奨ブラウザは、SafariおよびGoogle Chromeです。これらの最新バージョンをご利用いただくことで、より安定した動作と快適な操作性が得られます。
+                    </p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>料金はかかりますか？</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        完全無料でご利用いただけます。
+                    </p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>位置情報が更新されないのですが？</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        ブラウザの位置情報許可設定をご確認ください。また、建物の中や地下など、GPS信号が弱い場所では位置情報の精度が低下する場合があります。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA セクション -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-card">
+            <h2 class="cta-title">さあ、始めましょう</h2>
+            
+            <form method="post" action="{% url 'tracker:create_session' %}">
+                {% csrf_token %}
+                <select class="duration-select" name="duration" aria-label="利用時間" required>
+    <option value="15">15分間</option>
+    <option value="30" selected>30分間</option>
+    <option value="60">1時間</option>
+    <option value="120">2時間</option>
+    <option value="240">4時間</option>
+    <option value="480">8時間</option>
+    <option value="720">12時間</option>
+</select>
+                <br>
+                <button type="submit" class="btn-start">
+                    <i class="fas fa-rocket"></i>
+                    今すぐ始める
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+<!-- 統計情報 -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" id="active-sessions-count">{{ active_sessions_count|add:16 }}</div>
+                <div class="stat-label">アクティブセッション</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="online-participants-count">{{ online_participants_count|add:33 }}</div>
+                <div class="stat-label">現在の利用者</div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+// FAQ アコーディオン
+document.querySelectorAll('.faq-question').forEach(button => {
+    button.addEventListener('click', () => {
+        const faqItem = button.parentElement;
+        faqItem.classList.toggle('active');
+        
+        // 他のFAQを閉じる
+        document.querySelectorAll('.faq-item').forEach(item => {
+            if (item !== faqItem) {
+                item.classList.remove('active');
+            }
+        });
+    });
+});
+
+// 統計情報の更新
+function updateStats() {
+    fetch('{% url "tracker:api_get_stats" %}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('active-sessions-count').textContent = data.active_sessions_count + 16;
+                document.getElementById('online-participants-count').textContent = data.online_participants_count + 33;
+            }
+        })
+        .catch(error => {
+            console.error('統計情報の取得に失敗しました:', error);
+        });
+}
+
+// 初回読み込み時と定期的な更新
+document.addEventListener('DOMContentLoaded', () => {
+    updateStats();
+    setInterval(updateStats, 30000); // 30秒ごとに更新
+});
+
+// スクロールアニメーション
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+        }
+    });
+}, observerOptions);
+
+// アニメーション対象要素の監視
+document.querySelectorAll('.feature-card, .step-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+});
+</script>
+{% endblock %}

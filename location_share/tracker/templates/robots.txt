@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /share/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /ws/
+
+# サイトマップの場所
+Sitemap: {{ request.build_absolute_uri }}/sitemap.xml
+
+# クロール間隔の指定
+Crawl-delay: 1
